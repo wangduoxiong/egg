@@ -31,7 +31,7 @@ public class Config {
     public static long maxSize = 1000 * 1000;
 
     /**
-     * 是否支持断电抓取
+     * 是否支持断点抓取
      */
     public static boolean supportResume = false;
 
