@@ -1,72 +1,35 @@
 package edu.xiyou.andrew.Egg.PageProcessor.pageinfo;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by andrew on 15-1-18.
  */
 public class HttpResponHeaders implements HttpHeaderMetadata{
-    private String contentType;
-    private String contentEncoding;
-    private List<String> setCookies;
-    private String vary;
-    private String date;
-    private String connection;
-    private String cacheControl;
+    private Map<String, List<String>> headears;
 
-    public String getContentType() {
-        return contentType;
+    public HttpResponHeaders(Map<String, List<String>> headears) {
+        this.headears = headears;
     }
 
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
+    public Map<String, List<String>> getHeadears() {
+        return headears;
     }
 
-    public String getContentEncoding() {
-        return contentEncoding;
+    public void setHeadears(Map<String, List<String>> headears) {
+        this.headears = headears;
     }
 
-    public void setContentEncoding(String contentEncoding) {
-        this.contentEncoding = contentEncoding;
+    public List<String> getValue(String key){
+        return headears.get(key);
     }
 
-    public List<String> getSetCookies() {
-        return setCookies;
-    }
+    public void setValue(String key, List<String> value){
+        if (key == null){
+            return;
+        }
 
-    public void setSetCookies(List<String> setCookies) {
-        this.setCookies = setCookies;
-    }
-
-    public String getVary() {
-        return vary;
-    }
-
-    public void setVary(String vary) {
-        this.vary = vary;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public String getConnection() {
-        return connection;
-    }
-
-    public void setConnection(String connection) {
-        this.connection = connection;
-    }
-
-    public String getCacheControl() {
-        return cacheControl;
-    }
-
-    public void setCacheControl(String cacheControl) {
-        this.cacheControl = cacheControl;
+        headears.put(key, value);
     }
 }
