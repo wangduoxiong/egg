@@ -20,41 +20,41 @@ import java.net.URL;
 /**
  * Created by andrew on 15-1-18.
  */
-public class HttpRequest implements Request{
-    private Logger logger =  LoggerFactory.getLogger(getClass());
+public class HttpRequest implements Request {
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     private HttpRequestHeaders headers;
     private Proxy proxy;
 
     private HttpURLConnection getConnectionInstance(URL _URL) throws IOException {
         HttpURLConnection con = null;
-        if (proxy == null){
+        if (proxy == null) {
             con = (HttpURLConnection) _URL.openConnection();
-        }else {
+        } else {
             con = (HttpURLConnection) _URL.openConnection(proxy);
         }
 
-        if (headers == null){
+        if (headers == null) {
             return con;
         }
 
-        if (headers.getCookie() != null){
+        if (headers.getCookie() != null) {
             con.setRequestProperty(HttpHeaderMetadata.COOKIE, headers.getCookie());
         }
 
-        if (headers.getUserAgent() != null){
+        if (headers.getUserAgent() != null) {
             con.setRequestProperty(HttpHeaderMetadata.USER_AGENT, headers.getUserAgent());
         }
 
-        if (headers.getCacheControl() != null){
+        if (headers.getCacheControl() != null) {
             con.setRequestProperty(HttpHeaderMetadata.CACHE_CONTROL, headers.getCacheControl());
         }
 
-        if (headers.getConnection() != null){
+        if (headers.getConnection() != null) {
             con.setRequestProperty(HttpHeaderMetadata.CONNECTION, headers.getConnection());
         }
 
-        if (headers.getHost() != null){
+        if (headers.getHost() != null) {
             con.setRequestProperty(HttpHeaderMetadata.HOST, headers.getHost());
         }
 
@@ -62,12 +62,12 @@ public class HttpRequest implements Request{
     }
 
     @Override
-    public HttpResponse getResponse(String url) throws Exception {
+    public HttpResponse getResponse(String url) throws IOException {
         HttpResponse response = new HttpResponse(url);
         HttpURLConnection con = null;
         URL _URL = new URL(url);
 
-        for (int i = 0; i < Config.retry; i ++){
+        for (int i = 0; i < Config.retry; i++) {
             con = getConnectionInstance(_URL);
             con.setInstanceFollowRedirects(false);
             con.setDoOutput(true);
@@ -75,16 +75,17 @@ public class HttpRequest implements Request{
             con.setConnectTimeout(500);
             con.setReadTimeout(1000);
 
-            if (con.getResponseCode() == HttpURLConnection.HTTP_OK || (i == 2)){
+            if (con.getResponseCode() == HttpURLConnection.HTTP_OK || (i == 2)) {
                 response.setStatusCode(con.getResponseCode());
                 response.setHeaders(con.getHeaderFields());
                 response.setFetchTime(System.currentTimeMillis());
+                logger.info(HttpRequest.class.getName(), "url: " + url + "   StatusCode: " + con.getResponseCode());
 
                 InputStream is = con.getInputStream();
                 byte[] buf = new byte[4096];
                 int read = 0;
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                while ((read = is.read(buf)) != -1){
+                while ((read = is.read(buf)) != -1) {
                     baos.write(buf, 0, read);
                 }
 
@@ -114,15 +115,4 @@ public class HttpRequest implements Request{
         this.proxy = proxy;
     }
 
-    public static void main(String[] args) throws Exception {
-        HttpRequest request = new HttpRequest();
-        HttpResponse response = request.getResponse("http://dict.youdao.com/search?le=eng&q=%20infinite&keyfrom=dict.top");
-        //System.out.println(Jsoup.parse(new String(response.getContent(), response.getCharset())));
-        Document document = Jsoup.parse(new String(response.getContent(), response.getCharset()));
-        System.out.println(LinkFilter.getLinks(document));
-//        Elements elements = document.getElementsByTag("link");
-//        for (Element element : elements){
-//            System.out.println("text: " + element.attr("rel") + "\nurl: " + element.attr("abs:href"));
-//        }
-    }
 }
