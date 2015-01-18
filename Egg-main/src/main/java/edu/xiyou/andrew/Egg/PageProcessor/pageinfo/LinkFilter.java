@@ -13,15 +13,17 @@ import java.util.List;
  */
 public class LinkFilter {
     public static List<Link> getLinksByA(Document document){
-        List<Link> lists = new LinkedList<Link>();
+        List<Link> links = new LinkedList<Link>();
         Elements elements = document.select("a[href]");
 
         for (Element element : elements){
             String anchor = element.text();
             String url = element.attr("abs:href");
-            lists.add(new Link(anchor, url));
+            if (url.length() > 6){
+                links.add(new Link(anchor, url));
+            }
         }
-        return lists;
+        return links;
     }
 
     public static List<Link> getLinksByCss(Document document){
@@ -29,9 +31,11 @@ public class LinkFilter {
         Elements elements = document.select("link[href]");
 
         for (Element element : elements){
-            String anchor = element.text();
+            String anchor = element.attr("rel");
             String url = element.attr("abs:href");
-            links.add(new Link(anchor, url));
+            if (url.length() > 6){
+                links.add(new Link(anchor, url));
+            }
         }
         return links;
     }
@@ -43,7 +47,9 @@ public class LinkFilter {
         for (Element element : elements) {
             String anchor = element.text();
             String url = element.attr("abs:src");
-            links.add(new Link(anchor, url));
+            if (url.length() > 6){
+                links.add(new Link(anchor, url));
+            }
         }
 
         return links;
@@ -55,17 +61,19 @@ public class LinkFilter {
         Elements elements = document.select("img[src]");
 
         for (Element element : elements){
-            String anchor = element.text();
+            String anchor = element.attr("alt");
             String url = element.attr("abs:src");
-            links.add(new Link(anchor, url));
+            if (url.length() > 6){
+                links.add(new Link(anchor, url));
+            }
         }
 
         return links;
     }
 
     public static List<Link> getLinks(Document document){
-        List<Link> links;
-        links = getLinksByA(document);
+        List<Link> links = new LinkedList<Link>();
+        links.addAll(getLinksByA(document));
         links.addAll(getLinksByCss(document));
         links.addAll(getLinksByImg(document));
         links.addAll(getLinksByJs(document));

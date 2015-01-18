@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * Created by andrew on 15-1-18.
  */
-public class HttpResponHeaders implements HttpHeaderMetadata{
+public class HttpResponHeaders{
     private Map<String, List<String>> headears;
 
     public HttpResponHeaders(Map<String, List<String>> headears) {

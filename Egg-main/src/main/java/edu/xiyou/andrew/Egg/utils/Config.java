@@ -4,7 +4,7 @@ package edu.xiyou.andrew.Egg.utils;
  * 爬虫的全局配置
  * Created by andrew on 15-1-16.
  */
-public class Config {
+public interface Config {
     /**
      * 是否备份抓取的文件
      */
@@ -39,4 +39,6 @@ public class Config {
      * 线程数量
      */
     public static int threadNum = 10;
+
+    public static int retry = 3;
 }

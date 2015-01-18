@@ -4,7 +4,7 @@ package edu.xiyou.andrew.Egg.PageProcessor.pageinfo;
  * Http header 信息
  * Created by andrew on 15-1-18.
  */
-public class HttpRequestHeaders implements HttpHeaderMetadata{
+public class HttpRequestHeaders{
 
     private String cookie;
     private String userAgent;
