@@ -4,19 +4,7 @@ package edu.xiyou.andrew.Egg.PageProcessor.pageinfo;
  * Http header 信息
  * Created by andrew on 15-1-18.
  */
-public class HttpHeaders {
-
-    public static final String COOKIE = "Cookie";
-
-    public static final String CONNECTION = "Connection";
-
-    public static final String HOST = "Host";
-
-    public static final String USER_AGENT = "User-Agent";
-
-    public static final String REFERER = "Referer";
-
-    public static final String CACHE_CONTROL = "Cache-Control";
+public class HttpRequestHeaders implements HttpHeaderMetadata{
 
     private String cookie;
     private String userAgent;
