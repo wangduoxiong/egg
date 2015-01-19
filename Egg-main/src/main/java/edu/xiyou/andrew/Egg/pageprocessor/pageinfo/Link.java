@@ -1,4 +1,4 @@
-package edu.xiyou.andrew.Egg.PageProcessor.pageinfo;
+package edu.xiyou.andrew.Egg.pageprocessor.pageinfo;
 
 /**
  * 网页的信息

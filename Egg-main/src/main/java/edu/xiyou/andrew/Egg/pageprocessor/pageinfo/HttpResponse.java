@@ -1,4 +1,4 @@
-package edu.xiyou.andrew.Egg.PageProcessor.pageinfo;
+package edu.xiyou.andrew.Egg.pageprocessor.pageinfo;
 
 
 import edu.xiyou.andrew.Egg.utils.CharsetDetector;

@@ -1,4 +1,4 @@
-package edu.xiyou.andrew.Egg.PageProcessor.pageinfo;
+package edu.xiyou.andrew.Egg.pageprocessor.pageinfo;
 
 /**
  * Created by andrew on 15-1-18.
