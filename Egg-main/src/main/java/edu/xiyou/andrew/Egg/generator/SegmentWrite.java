@@ -1,0 +1,110 @@
+package edu.xiyou.andrew.Egg.generator;
+
+import com.sleepycat.je.Database;
+import com.sleepycat.je.DatabaseEntry;
+import com.sleepycat.je.Environment;
+import edu.xiyou.andrew.Egg.pageprocessor.pageinfo.CrawlDatum;
+
+import java.io.File;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
+/**
+ * Created by andrew on 15-1-20.
+ */
+public class SegmentWrite {
+    private static final int BUFF_SIZE = 20;
+    protected Database fetchDB;
+    protected Database linkDB;
+
+    private static AtomicInteger fetchCount;
+    private static AtomicInteger linkCount;
+    private Environment environment;
+
+    static {
+        fetchCount = new AtomicInteger(0);
+        linkCount = new AtomicInteger(0);
+    }
+
+    public SegmentWrite(Environment environment) throws Exception {
+        this.environment = environment;
+        fetchDB = BerkeleyDBFactory.createDB(environment, "fetch");
+        linkDB = BerkeleyDBFactory.createDB(environment, "link");
+    }
+
+    public void writeFetch(CrawlDatum datum) throws Exception{
+        DatabaseEntry keyEntry = new DatabaseEntry(datum.getUrl().getBytes());
+        DatabaseEntry valueEntry = new DatabaseEntry();
+        byte[] value = new byte[9];
+        value[0] = datum.getStatus();
+        long tmp = datum.getFetchTime();
+
+        value[1] = (byte)((tmp >> 56) & 0xFF);
+        value[2] = (byte)((tmp >> 48) & 0xFF);
+        value[3] = (byte)((tmp >> 40) & 0xFF);
+        value[4] = (byte)((tmp >> 32) & 0xFF);
+        value[5] = (byte)((tmp >> 24) & 0xFF);
+        value[6] = (byte)((tmp >> 16) & 0xFF);
+        value[7] = (byte)((tmp >> 8) & 0xFF);
+        value[8] = (byte)((tmp >> 0) & 0xFF);
+        valueEntry.setData(value);
+
+//        a = (long)( (buf[7] & 0xFF) |
+//                (buf[6] & 0xFF) << 8 |
+//                (buf[5] & 0xFF) << 16 |
+//                (buf[4] & 0xFF) << 24 |
+//                (buf[3] & 0xFF << 32) |
+//                (buf[2] & 0xFF) << 40 |
+//                (buf[1] & 0xFF) << 48 |
+//                (buf[0] & 0xFF) << 56
+//        );
+
+        fetchDB.put(null, keyEntry, valueEntry);
+        if (fetchCount.incrementAndGet() % BUFF_SIZE == 0){
+            fetchDB.sync();
+        }
+    }
+
+    public void writeFetchs(List<CrawlDatum> datums) throws Exception {
+        for (CrawlDatum datum : datums){
+            writeFetch(datum);
+        }
+    }
+
+    public void writeLink(String link) throws Exception{
+        DatabaseEntry keyEntry = new DatabaseEntry(link.getBytes());
+        byte[] value = new byte[1];
+        value[0] = CrawlDatum.CRAWLDATUM_UNFETCH;
+        DatabaseEntry valueEntry = new DatabaseEntry(value);
+        linkDB.put(null, keyEntry, valueEntry);
+        if (linkCount.incrementAndGet() % BUFF_SIZE == 0){
+            linkDB.sync();
+        }
+    }
+
+    public void writeLinks(List<String> links) throws Exception {
+        for (String link : links){
+            writeLink(link);
+        }
+    }
+
+    public void close(){
+        if (fetchDB != null){
+            fetchDB.close();
+        }
+        if (linkDB != null){
+            linkDB.close();
+        }
+        if (environment != null){
+            environment.close();
+        }
+    }
+
+    public static AtomicInteger getFetchCount() {
+        return fetchCount;
+    }
+
+    public static AtomicInteger getLinkCount() {
+        return linkCount;
+    }
+}
