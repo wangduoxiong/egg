@@ -35,10 +35,10 @@ public class StandardGenerator implements Generator{
                 value = valueEntry.getData();
                 if ((value[0] & CrawlDatum.STATUS_FETCHED) == CrawlDatum.STATUS_FETCHED){
                     try {
-                        if (!(SegmentWrite.bytes2Long(value, 1) - System.currentTimeMillis() > Config.interval))
+                        if (!(System.currentTimeMillis() - SegmentWrite.bytes2Long(value, 1) > Config.interval))
                             continue;
                         else
-                            return new CrawlDatum(new String(keyEntry.getData()), SegmentWrite.bytes2Long(value, 1), value[0]);
+                            return new CrawlDatum(new String(keyEntry.getData()), value[0], SegmentWrite.bytes2Long(value, 1));
                     } catch (Exception e) {
                         LOG.info("StandardGenerator {}", e);
                         continue;

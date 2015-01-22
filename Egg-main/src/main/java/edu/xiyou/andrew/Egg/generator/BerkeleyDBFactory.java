@@ -26,7 +26,7 @@ public class BerkeleyDBFactory{
         DatabaseConfig databaseConfig = new DatabaseConfig();
 
         databaseConfig.setAllowCreate(true);
-        databaseConfig.setSortedDuplicates(true);
+        //databaseConfig.setSortedDuplicates(true);
 
         Database database = environment.openDatabase(null, tableName, databaseConfig);
         return database;
