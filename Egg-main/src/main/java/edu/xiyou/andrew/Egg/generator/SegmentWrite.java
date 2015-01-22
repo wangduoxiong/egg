@@ -137,7 +137,7 @@ public class SegmentWrite {
     }
 
     /**
-     * 将link写入数据库,key是链接url, value值value数组，value[0]代表爬取状态,状态可进行&运算,同时存取多个状态,
+     * 将link写入数据库,key是链接url, value值value数组，value[0]代表爬取状态,状态可进行|运算,同时存取多个状态,
      *                                              value[1-8]代表爬取时间
      * @param link
      * @throws Exception

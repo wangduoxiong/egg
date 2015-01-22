@@ -28,11 +28,10 @@ public class CrawlDatum {
     public static final long TIME_UNFETCH = 0;
 
     public CrawlDatum(String url, byte status) {
-        this.url = url;
-        this.status = status;
+        this(url, status, TIME_UNFETCH);
     }
 
-    public CrawlDatum(String url, long fetchTime, byte status) {
+    public CrawlDatum(String url, byte status, long fetchTime) {
         this.url = url;
         this.fetchTime = fetchTime;
         this.status = status;
