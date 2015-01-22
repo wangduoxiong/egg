@@ -12,15 +12,20 @@ public class CrawlDatum {
     /**
      * 未爬取状态
      */
-    public static final byte CRAWLDATUM_UNFETCH = 1;
+    public static final byte STATUS_UNFETCH = 1;
     /**
      * 已爬取状态
      */
-    public static final byte CRAWLDATUM_FETCHED = 2;
+    public static final byte STATUS_FETCHED = 2;
     /**
      * 已注入
      */
-    public static final byte CRAWLDATUM_INJECTED = 4;
+    public static final byte STATUS_INJECTED = 4;
+
+    /**
+     * 未爬取
+     */
+    public static final long TIME_UNFETCH = 0;
 
     public CrawlDatum(String url, byte status) {
         this.url = url;
