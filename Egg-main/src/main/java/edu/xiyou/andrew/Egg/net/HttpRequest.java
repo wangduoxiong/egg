@@ -70,7 +70,7 @@ public class HttpRequest implements Request {
             con.setConnectTimeout(500);
             con.setReadTimeout(1000);
 
-            if (con.getResponseCode() == HttpURLConnection.HTTP_OK || (i == 2)) {
+            if (con.getResponseCode() == HttpURLConnection.HTTP_OK || ((Config.retry-1) == 2)) {
                 response.setStatusCode(con.getResponseCode());
                 response.setHeaders(con.getHeaderFields());
                 response.setFetchTime(System.currentTimeMillis());
