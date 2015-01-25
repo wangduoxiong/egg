@@ -41,4 +41,6 @@ public interface Config {
     public static int threadNum = 10;
 
     public static int retry = 3;
+
+    public static long WAIT_THREAD_END_TIME=1000*60;
 }

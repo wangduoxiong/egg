@@ -49,4 +49,16 @@ public class StandardGenerator implements Generator{
             }
         }
     }
+
+    public void close(){
+        if (cursor != null) {
+            cursor.close();
+        }
+        if (database != null) {
+            database.close();
+        }
+        if (environment != null) {
+            environment.close();
+        }
+    }
 }
