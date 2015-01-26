@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ *
+ * 将链接数据写入Berkeley数据库的基本类库
  * Created by andrew on 15-1-20.
  */
 public class SegmentWrite {

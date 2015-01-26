@@ -27,6 +27,7 @@ public class BerkeleyDBFactory{
 
         databaseConfig.setAllowCreate(true);
         //databaseConfig.setSortedDuplicates(true);
+        databaseConfig.setDeferredWrite(true);
 
         Database database = environment.openDatabase(null, tableName, databaseConfig);
         return database;

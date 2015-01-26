@@ -106,7 +106,7 @@ public abstract class Crawler implements Handle{
             fetcher.setThreads(threads);
             fetcher.fetchAll(generator);
         }
-        environment.close();
+//        environment.close();
     }
 
     public void stop(){
