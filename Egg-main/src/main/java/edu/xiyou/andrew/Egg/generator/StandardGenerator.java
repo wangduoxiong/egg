@@ -16,10 +16,8 @@ public class StandardGenerator implements Generator{
     private Database database;
     private static final Logger LOG = LoggerFactory.getLogger(StandardGenerator.class);
 
-    public StandardGenerator(Environment environment) throws Exception {
+    public StandardGenerator(Environment environment){
         this.environment = environment;
-        database = BerkeleyDBFactory.createDB(environment, "crawl");
-        cursor = database.openCursor(null, CursorConfig.DEFAULT);
     }
 
     /**
@@ -27,7 +25,11 @@ public class StandardGenerator implements Generator{
      * @return
      */
     @Override
-    public CrawlDatum nextDatum() {
+    public CrawlDatum nextDatum() throws Exception {
+        if (cursor == null){
+            database = BerkeleyDBFactory.createDB(environment, "crawl");
+            cursor = database.openCursor(null, CursorConfig.DEFAULT);
+        }
         DatabaseEntry keyEntry = new DatabaseEntry();
         DatabaseEntry valueEntry = new DatabaseEntry();
         byte[] value;
@@ -53,9 +55,8 @@ public class StandardGenerator implements Generator{
             }
         }catch (Exception e){
             LOG.info("Exception :" + e);
-        }finally {
-            close();
             return null;
+        }finally {
         }
     }
 

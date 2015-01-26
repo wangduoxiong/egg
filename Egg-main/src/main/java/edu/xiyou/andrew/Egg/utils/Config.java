@@ -38,7 +38,7 @@ public interface Config {
     /**
      * 线程数量
      */
-    public static int threadNum = 10;
+    public static int threadNum = 2;
 
     public static int retry = 3;
 

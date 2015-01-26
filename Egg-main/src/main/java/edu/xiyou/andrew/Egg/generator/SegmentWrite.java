@@ -4,6 +4,8 @@ import com.sleepycat.je.Database;
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.Environment;
 import edu.xiyou.andrew.Egg.pageprocessor.pageinfo.CrawlDatum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.List;
@@ -23,16 +25,24 @@ public class SegmentWrite {
     private static AtomicInteger linkCount;     //链接的数量
     private Environment environment;
 
-    static {
+    private static final Logger LOG = LoggerFactory.getLogger(SegmentWrite.class);
+
+    public SegmentWrite(Environment environment) throws Exception {
+        this.environment = environment;
+
+    }
+
+    public  void init(){
+        try {
+            fetchDB = BerkeleyDBFactory.createDB(environment, "fetch");
+            linkDB = BerkeleyDBFactory.createDB(environment, "link");
+        } catch (Exception e) {
+            LOG.info("Exception :" + e);
+        }
         fetchCount = new AtomicInteger(0);
         linkCount = new AtomicInteger(0);
     }
 
-    public SegmentWrite(Environment environment) throws Exception {
-        this.environment = environment;
-        fetchDB = BerkeleyDBFactory.createDB(environment, "fetch");
-        linkDB = BerkeleyDBFactory.createDB(environment, "link");
-    }
 
     public void writeFetch(CrawlDatum datum) throws Exception{
         DatabaseEntry keyEntry = new DatabaseEntry(datum.getUrl().getBytes());

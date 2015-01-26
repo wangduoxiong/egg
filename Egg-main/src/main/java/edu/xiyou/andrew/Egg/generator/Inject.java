@@ -42,7 +42,7 @@ public class Inject {
         }
         valueEntry.setData(bytes);
         database.put(null, keyEntry, valueEntry);
-
+        database.sync();
         if (count.incrementAndGet() % 20 == 0) {
             database.sync();
         }

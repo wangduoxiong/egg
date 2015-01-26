@@ -1,6 +1,7 @@
 package edu.xiyou.andrew.Egg.fetcher;
 
 import edu.xiyou.andrew.Egg.generator.DBUpdater;
+import edu.xiyou.andrew.Egg.generator.Links;
 import edu.xiyou.andrew.Egg.generator.StandardGenerator;
 import edu.xiyou.andrew.Egg.net.HttpRequest;
 import edu.xiyou.andrew.Egg.pageprocessor.pageinfo.CrawlDatum;
@@ -74,7 +75,7 @@ public class Fetcher{
         }
 
         public synchronized FetchItem getFetchItem(){
-            if (queue == null){
+            if (queue == null || queue.isEmpty()){
                 return null;
             }
             return queue.remove(0);
@@ -91,13 +92,13 @@ public class Fetcher{
     public static class QueueFeeder extends Thread{
         public FetchQueue queue;
         public StandardGenerator generator;
-
         public int size;
 
         public QueueFeeder(FetchQueue queue, StandardGenerator generator, int size){
             this.queue = queue;
             this.generator = generator;
             this.size = size;
+
         }
 
         public boolean running = true;
@@ -119,33 +120,45 @@ public class Fetcher{
             boolean hasMore = true;
             running = true;
 
-            while (hasMore && running){
-                int feed = size - queue.getSize();
+            try {
 
-                if (feed <= 0){
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
+                while (hasMore && running) {
+                    int feed = size - queue.getSize();
 
+                    if (feed <= 0) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+
+                        }
+                        continue;
                     }
-                    continue;
-                }
 
-                while (feed > 0 && hasMore && running){
-                    CrawlDatum datum = generator.nextDatum();
-                    hasMore = (datum != null);
+                    while (feed > 0 && hasMore && running) {
+                        CrawlDatum datum = null;
+                        try {
+                            datum = generator.nextDatum();
 
-                    if (hasMore){
-                        queue.addFetchItem(new FetchItem(datum));
-                        feed--;
+                            hasMore = (datum != null);
+
+                            if (hasMore) {
+                                System.out.println(datum);
+                                queue.addFetchItem(new FetchItem(datum));
+                                feed--;
+                            }
+                        } catch (Exception e) {
+                            LOG.info("Exception 11111:" + e);
+                        }
                     }
+                    generator.close();
                 }
-                generator.close();
+            }catch (Exception e){
+                LOG.info("Exception :" + e);
             }
         }
     }
 
-    boolean running;
+    boolean running = true;
 
     private class FetcherThread extends Thread{
 
@@ -159,8 +172,10 @@ public class Fetcher{
                     try {
                         item = fetchQueue.getFetchItem();
                         if (item == null){
+
                             if (feeder.isAlive() || fetchQueue.getSize() > 0){
                                 spinWaiting.incrementAndGet();
+
 
                                 try {
                                     Thread.sleep(500);
@@ -211,7 +226,8 @@ public class Fetcher{
                                 continue;
                             }
 
-                            List<String> nextLinks = null;
+                            handle.onSuccess(response);
+                            Links nextLinks = null;
 
                             try {
                                 nextLinks = handle.visitAndGetNextLinks(response);
@@ -249,6 +265,7 @@ public class Fetcher{
         }
         dbUpdater.locked();
         running = true;
+        dbUpdater.getSegmentWrite().init();
     }
 
     public void fetchAll(StandardGenerator generator) throws Exception{

@@ -21,6 +21,14 @@ public class HttpRequest implements Request {
     private HttpRequestHeaders headers;
     private Proxy proxy;
 
+    public HttpRequest(){
+
+    }
+
+    public HttpRequest(HttpRequestHeaders headers) {
+        this.headers = headers;
+    }
+
     private HttpURLConnection getConnectionInstance(URL _URL) throws IOException {
         HttpURLConnection con = null;
         if (proxy == null) {
@@ -57,41 +65,40 @@ public class HttpRequest implements Request {
     }
 
     @Override
-    public HttpResponse getResponse(String url) throws IOException {
+    public HttpResponse getResponse(String url) throws Exception {
         HttpResponse response = new HttpResponse(url);
         HttpURLConnection con = null;
         URL _URL = new URL(url);
 
-        for (int i = 0; i < Config.retry; i++) {
-            con = getConnectionInstance(_URL);
-            con.setInstanceFollowRedirects(false);
-            con.setDoOutput(true);
-            con.setDoInput(true);
-            con.setConnectTimeout(500);
-            con.setReadTimeout(1000);
+        con = getConnectionInstance(_URL);
+        con.setInstanceFollowRedirects(false);
+        con.setDoInput(true);
+        con.setDoOutput(true);
+        con.setConnectTimeout(500);
+        con.setReadTimeout(1000);
 
-            if (con.getResponseCode() == HttpURLConnection.HTTP_OK || ((Config.retry-1) == 2)) {
-                response.setStatusCode(con.getResponseCode());
-                response.setHeaders(con.getHeaderFields());
-                response.setFetchTime(System.currentTimeMillis());
-                logger.info(HttpRequest.class.getName(), "url: " + url + "   StatusCode: " + con.getResponseCode());
+        response.setStatusCode(con.getResponseCode());
+        response.setHeaders(con.getHeaderFields());
+        response.setFetchTime(System.currentTimeMillis());
+        logger.info(HttpRequest.class.getName(), "url :" + url + "  StatusCode: " + con.getResponseCode());
 
-                InputStream is = con.getInputStream();
-                byte[] buf = new byte[4096];
-                int read = 0;
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                while ((read = is.read(buf)) != -1) {
-                    baos.write(buf, 0, read);
-                }
-
-                is.close();
-                baos.close();
-                response.setContent(baos.toByteArray());
-                return response;
+        InputStream is = con.getInputStream();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try{
+            byte[] buf = new byte[4096];
+            int read = 0;
+            while ((read = is.read(buf)) != -1) {
+                baos.write(buf, 0, read);
             }
-
+            response.setContent(baos.toByteArray());
+        }catch (IOException e){
+            response.setContent(null);
+            logger.info(HttpRequest.class.getName(), e);
+        }finally {
+            is.close();
+            baos.close();
         }
-        return null;
+        return response;
     }
 
     public HttpRequestHeaders getHeaders() {

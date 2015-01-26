@@ -11,5 +11,5 @@ public interface Generator {
      * 生成种子的接口
      * @return
      */
-    public CrawlDatum nextDatum();
+    public CrawlDatum nextDatum() throws Exception;
 }

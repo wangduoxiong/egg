@@ -9,6 +9,8 @@ import edu.xiyou.andrew.Egg.generator.Inject;
 import edu.xiyou.andrew.Egg.generator.StandardGenerator;
 import edu.xiyou.andrew.Egg.net.HttpRequest;
 import edu.xiyou.andrew.Egg.pageprocessor.pageinfo.CrawlDatum;
+import edu.xiyou.andrew.Egg.pageprocessor.pageinfo.HttpHeaderMetadata;
+import edu.xiyou.andrew.Egg.pageprocessor.pageinfo.HttpRequestHeaders;
 import edu.xiyou.andrew.Egg.utils.Config;
 import edu.xiyou.andrew.Egg.utils.FileUtils;
 import org.slf4j.Logger;
@@ -17,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.net.Proxy;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -35,12 +38,22 @@ public abstract class Crawler implements Handle{
     protected Fetcher fetcher;
 
     protected Handle handle = this;
-    protected HttpRequest request = new HttpRequest();
+    protected HttpRequest request;
     String crawlPath;
     Environment environment;
 
     public static final int RUNNING = 1;
     public static final int STOPED = 2;
+
+    {
+//        HashMap<String, String> headers = new HashMap<String, String>();
+//        headers.put(HttpHeaderMetadata.USER_AGENT, "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36");
+//        headers.put(HttpHeaderMetadata.COOKIE, "wdcid=6bff909e26a9e1d4; ALLYESID4=09895E0EE3D51841; xh_regionalNews_v1=12; wdlast=1422273537");
+        HttpRequestHeaders headers = new HttpRequestHeaders();
+        headers.setCookie("wdcid=6bff909e26a9e1d4; ALLYESID4=09895E0EE3D51841; xh_regionalNews_v1=12; wdlast=1422273537");
+        headers.setUserAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36");
+        request = new HttpRequest(headers);
+    }
 
     public Crawler(String crawlPath){
         this.crawlPath = crawlPath;
@@ -98,6 +111,7 @@ public abstract class Crawler implements Handle{
             LOG.info("starting depth " + (i + 1));
 
             StandardGenerator generator = new StandardGenerator(environment);
+
             fetcher = new Fetcher();
             fetcher.setRetry(retry);
             fetcher.setHttpRequest(request);

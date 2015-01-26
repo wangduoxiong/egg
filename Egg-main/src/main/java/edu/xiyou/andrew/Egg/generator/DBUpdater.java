@@ -18,34 +18,52 @@ public class DBUpdater {
 
     public DBUpdater(Environment environment) throws Exception {
         this.environment = environment;
-        lockDatabases = BerkeleyDBFactory.createDB(environment, "lock");
+
         segmentWrite = new SegmentWrite(environment);
     }
 
     public void locked() {
-        DatabaseEntry keyEntry = new DatabaseEntry("lock".getBytes());
-        DatabaseEntry valueEntry = new DatabaseEntry("locked".getBytes());
-        lockDatabases.put(null, keyEntry, valueEntry);
-        lockDatabases.sync();
+        try {
+            lockDatabases = BerkeleyDBFactory.createDB(environment, "lock");
+            DatabaseEntry keyEntry = new DatabaseEntry("lock".getBytes());
+            DatabaseEntry valueEntry = new DatabaseEntry("locked".getBytes());
+            lockDatabases.put(null, keyEntry, valueEntry);
+            lockDatabases.sync();
+            lockDatabases.close();
+        } catch (Exception e) {
+            LOG.info(DBUpdater.class.getName(), e);
+        }
     }
 
     public void unlocked(){
-        DatabaseEntry keyEntry = new DatabaseEntry("lock".getBytes());
-        DatabaseEntry valueEntry = new DatabaseEntry("unlocked".getBytes());
-        lockDatabases.put(null, keyEntry, valueEntry);
-        lockDatabases.sync();
+        try {
+            lockDatabases = BerkeleyDBFactory.createDB(environment, "lock");
+            DatabaseEntry keyEntry = new DatabaseEntry("lock".getBytes());
+            DatabaseEntry valueEntry = new DatabaseEntry("unlocked".getBytes());
+            lockDatabases.put(null, keyEntry, valueEntry);
+            lockDatabases.sync();
+            lockDatabases.close();
+        }catch (Exception e){
+            LOG.info(DBUpdater.class.getName(), e);
+        }
     }
 
     public boolean islocked(){
-        DatabaseEntry keyEntry = new DatabaseEntry("lock".getBytes());
-        DatabaseEntry valueEntry = new DatabaseEntry();
-        if (lockDatabases.get(null, keyEntry, valueEntry, LockMode.DEFAULT) == OperationStatus.SUCCESS){
-            String info = new String(valueEntry.getData());
-            if (info.equals("locked")){
-                return true;
+        try {
+            lockDatabases = BerkeleyDBFactory.createDB(environment, "lock");
+            DatabaseEntry keyEntry = new DatabaseEntry("lock".getBytes());
+            DatabaseEntry valueEntry = new DatabaseEntry();
+            if (lockDatabases.get(null, keyEntry, valueEntry, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+                String info = new String(valueEntry.getData());
+                if (info.equals("locked")) {
+                    return true;
+                }
             }
+            return false;
+        }catch (Exception e){
+            LOG.info(DBUpdater.class.getName(), e);
+            return false;
         }
-        return false;
     }
 
     public void merge(){
@@ -54,6 +72,7 @@ public class DBUpdater {
             Database crawlDatabase = BerkeleyDBFactory.createDB(environment, "crawl");
             Database fetchDatabase = BerkeleyDBFactory.createDB(environment, "fetch");
             Database linkDatabase = BerkeleyDBFactory.createDB(environment, "link");
+            System.out.println("aaaaaaaaaaaaa");
             Cursor fetchCursor = fetchDatabase.openCursor(null, null);
             DatabaseEntry keyEntry = new DatabaseEntry();
             DatabaseEntry valueEntry = new DatabaseEntry();
@@ -80,11 +99,11 @@ public class DBUpdater {
             crawlDatabase.close();
 
             environment.removeDatabase(null, "fetch");
-            LOG.debug("remove fetch database");
+            LOG.debug("remove fetch database ");
             environment.removeDatabase(null, "link");
-            LOG.debug("remove link database");
+            LOG.debug("remove link database ");
         } catch (Exception e) {
-            LOG.info("open database failed");
+            LOG.info("open database failed " + e);
         }
     }
 

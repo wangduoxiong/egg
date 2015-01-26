@@ -56,4 +56,13 @@ public class CrawlDatum {
     public String getUrl() {
         return url;
     }
+
+    @Override
+    public String toString() {
+        return "CrawlDatum{" +
+                "url='" + url + '\'' +
+                ", fetchTime=" + fetchTime +
+                ", status=" + status +
+                '}';
+    }
 }

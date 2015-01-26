@@ -20,8 +20,6 @@ public class BerkeleyDBFactory{
      * @throws Exception
      */
     public static Database createDB(Environment environment, String tableName) throws Exception{
-        EnvironmentConfig environmentConfig = new EnvironmentConfig();
-        environmentConfig.setAllowCreate(true);
 
         DatabaseConfig databaseConfig = new DatabaseConfig();
 

@@ -1,5 +1,6 @@
 package edu.xiyou.andrew.Egg.fetcher;
 
+import edu.xiyou.andrew.Egg.generator.Links;
 import edu.xiyou.andrew.Egg.net.HttpRequest;
 import edu.xiyou.andrew.Egg.pageprocessor.pageinfo.HttpResponse;
 import edu.xiyou.andrew.Egg.pageprocessor.pageinfo.Link;
@@ -27,5 +28,5 @@ public interface Handle {
      * @param response
      * @return
      */
-    public List<String> visitAndGetNextLinks(HttpResponse response);
+    public Links visitAndGetNextLinks(HttpResponse response);
 }
