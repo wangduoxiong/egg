@@ -106,17 +106,17 @@ public class BerkeleyDBTest {
 //    }
 
 
-    public static void main(String[] args) throws Exception {
-        File dir = new File("/home/andrew/test");
-        EnvironmentConfig environmentConfig = new EnvironmentConfig();
-        environmentConfig.setAllowCreate(true);
-        environment = new Environment(dir, environmentConfig);
-        StandardGenerator generator = new StandardGenerator(environment);
-        System.out.println(generator.nextDatum().getUrl());
-    }
-
-
 //    public static void main(String[] args) throws Exception {
+//        File dir = new File("/home/andrew/test");
+//        EnvironmentConfig environmentConfig = new EnvironmentConfig();
+//        environmentConfig.setAllowCreate(true);
+//        environment = new Environment(dir, environmentConfig);
+//        StandardGenerator generator = new StandardGenerator(environment);
+//        System.out.println(generator.nextDatum().getUrl());
+//    }
+//
+//
+////    public static void main(String[] args) throws Exception {
 //
 //
 //        DatabaseConfig databaseConfig = new DatabaseConfig();

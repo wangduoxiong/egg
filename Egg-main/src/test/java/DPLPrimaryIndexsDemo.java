@@ -41,9 +41,9 @@ public class DPLPrimaryIndexsDemo {
 
             List<UserInfo4DPL> list = initObject();
             for (UserInfo4DPL vo : list){
-                System.out.println("----> Put object :\n" + vo);
+                System.out.println("----> Put object :\t" + vo);
                 UserInfo4DPL exit = pIndex.put(vo);
-                System.out.println("----> After put get the key exit object:\n" + exit);
+                System.out.println("----> After put get the key exit object:\t" + exit);
             }
             UserInfo4DPL data = list.get(0);
             System.out.println("----> Object 'description' change to www.baidu.com");
@@ -51,7 +51,7 @@ public class DPLPrimaryIndexsDemo {
             System.out.println("----> Put object:\n" + data);
             UserInfo4DPL retData = pIndex.put(data);
             System.out.println("----> After put get the key exit object:\n" + retData);
-            System.out.println("注意:put 返回值是当前key的上一个值");
+            System.out.println("注意:put 返回值是当前key的前一个值");
             System.out.println();
 
 
@@ -184,8 +184,8 @@ public class DPLPrimaryIndexsDemo {
     private List<UserInfo4DPL> initObject() {
         List<UserInfo4DPL> list = new ArrayList<UserInfo4DPL>();
         list.add(new UserInfo4DPL("ctosun", "Jack", "welcome to www.baidu.com"));
-        list.add(new UserInfo4DPL("testKey", "Oye", "welcome to www.baidu.com"));
-        list.add(new UserInfo4DPL("007", "Name", "welcome to www.baidu.com"));
+        list.add(new UserInfo4DPL("testKey", "Jack", "welcome to www.baidu.com"));
+        list.add(new UserInfo4DPL("007", "Jack", "welcome to www.baidu.com"));
         return list;
     }
 
