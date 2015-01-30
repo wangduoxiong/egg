@@ -28,7 +28,7 @@ public interface Config {
     /**
      * 抓取的网页的最大数量
      */
-    public static long maxSize = 1000 * 1000;
+    public static int maxSize = 1000 * 1000;
 
     /**
      * 是否支持断点抓取
@@ -43,4 +43,6 @@ public interface Config {
     public static int retry = 3;
 
     public static long WAIT_THREAD_END_TIME=1000*60;
+
+    public static int CPU_COUNT = Runtime.getRuntime().availableProcessors();
 }

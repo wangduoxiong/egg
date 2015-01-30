@@ -142,12 +142,11 @@ public class Fetcher{
                             hasMore = (datum != null);
 
                             if (hasMore) {
-                                System.out.println(datum);
                                 queue.addFetchItem(new FetchItem(datum));
                                 feed--;
                             }
                         } catch (Exception e) {
-                            LOG.info("Exception 11111:" + e);
+                            LOG.info("Exception: " + e);
                         }
                     }
                     generator.close();

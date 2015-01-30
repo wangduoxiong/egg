@@ -4,6 +4,8 @@ import com.sleepycat.je.Database;
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.Environment;
 import edu.xiyou.andrew.Egg.pageprocessor.pageinfo.CrawlDatum;
+import edu.xiyou.andrew.Egg.utils.BloomFilter;
+import edu.xiyou.andrew.Egg.utils.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +22,7 @@ public class SegmentWrite {
     private static final int BUFF_SIZE = 20;
     protected Database fetchDB; //已爬取数据库
     protected Database linkDB;
+    private BloomFilter<String> bloomFilter = new BloomFilter<String>(8, Config.maxSize);
 
     private static AtomicInteger fetchCount;    //已爬取的数量
     private static AtomicInteger linkCount;     //链接的数量
@@ -27,9 +30,8 @@ public class SegmentWrite {
 
     private static final Logger LOG = LoggerFactory.getLogger(SegmentWrite.class);
 
-    public SegmentWrite(Environment environment) throws Exception {
+    public SegmentWrite(Environment environment){
         this.environment = environment;
-
     }
 
     public  void init(){
@@ -122,10 +124,10 @@ public class SegmentWrite {
 
         long value;
         value = (long)( (bytes[7 + offset] & 0xFF) |
-                (bytes[6 + offset] & 0xFF) << 8 |
+                (bytes[6 + offset] & 0xFF) << 8  |
                 (bytes[5 + offset] & 0xFF) << 16 |
                 (bytes[4 + offset] & 0xFF) << 24 |
-                (bytes[3 + offset] & 0xFF << 32) |
+                (bytes[3 + offset] & 0xFF) << 32 |
                 (bytes[2 + offset] & 0xFF) << 40 |
                 (bytes[1 + offset] & 0xFF) << 48 |
                 (bytes[0 + offset] & 0xFF) << 56
@@ -161,6 +163,7 @@ public class SegmentWrite {
         long2Bytes(CrawlDatum.TIME_UNFETCH, value, 1);
         DatabaseEntry valueEntry = new DatabaseEntry(value);
         linkDB.put(null, keyEntry, valueEntry);
+
         if (linkCount.incrementAndGet() % BUFF_SIZE == 0){
             linkDB.sync();
         }
@@ -169,6 +172,15 @@ public class SegmentWrite {
     public void writeLinks(List<String> links) throws Exception {
         for (String link : links){
             writeLink(link);
+        }
+    }
+
+    public void sync(){
+        if (fetchDB != null){
+            fetchDB.sync();
+        }
+        if (linkDB != null){
+            linkDB.sync();
         }
     }
 
@@ -190,5 +202,19 @@ public class SegmentWrite {
 
     public static AtomicInteger getLinkCount() {
         return linkCount;
+    }
+
+    public void addElementBloomFilter(String url){
+        if (url == null){
+            return;
+        }
+        bloomFilter.add(url);
+    }
+
+    public boolean contains(String url){
+        if (url == null){
+            return false;
+        }
+        return bloomFilter.contains(url);
     }
 }
