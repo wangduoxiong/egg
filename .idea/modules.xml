@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Egg.iml" filepath="$PROJECT_DIR$/Egg.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Egg-main/Egg-main.iml" filepath="$PROJECT_DIR$/Egg-main/Egg-main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Egg-plugins/Egg-plugins.iml" filepath="$PROJECT_DIR$/Egg-plugins/Egg-plugins.iml" />
+    </modules>
+  </component>
+</project>
+

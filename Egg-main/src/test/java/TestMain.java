@@ -3,11 +3,9 @@ import edu.xiyou.andrew.Egg.fetcher.Handle;
 import edu.xiyou.andrew.Egg.generator.Links;
 import edu.xiyou.andrew.Egg.pageprocessor.pageinfo.HttpResponse;
 import edu.xiyou.andrew.Egg.pageprocessor.pageinfo.Link;
-import edu.xiyou.andrew.Egg.utils.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Created by andrew on 15-1-25.
