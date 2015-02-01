@@ -56,7 +56,7 @@ public class CrawlDatum {
         return fetchTime;
     }
 
-    public void setFetchTime(byte fetchTime) {
+    public void setFetchTime(long fetchTime) {
         this.fetchTime = fetchTime;
     }
 

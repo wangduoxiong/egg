@@ -9,6 +9,7 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,21 +31,18 @@ public final class Html extends HttpResponse{
         super(response);
         this.response = response;
         this.datum = datum;
-        HttpEntity entity = response.getEntity();
         try {
-            if (entity != null) {
-                content = getByteFromInputStream(response.getEntity().getContent());
-            }else
-                content = null;
+            HttpEntity entity = response.getEntity();
+
+            content = EntityUtils.toByteArray(entity);
         } catch (IOException e) {
-            LOG.info("IOException: " + e);
             content = null;
         }
         statusLine = response.getStatusLine();
         charset = CharsetDetector.guessEncoding(content);
     }
 
-    private byte[] getByteFromInputStream(InputStream inputStream){
+    protected byte[] getByteFromInputStream(InputStream inputStream){
         if (inputStream == null){
             return null;
         }

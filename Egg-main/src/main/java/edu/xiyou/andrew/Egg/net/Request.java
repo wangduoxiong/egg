@@ -12,5 +12,5 @@ public interface Request {
     /**
      * @return
      */
-    public abstract Object getResponse() throws Exception;
+    public Object getResponse() throws Exception;
 }
