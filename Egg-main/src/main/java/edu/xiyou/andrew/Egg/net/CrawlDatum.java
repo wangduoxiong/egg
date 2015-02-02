@@ -34,7 +34,7 @@ public class CrawlDatum {
      */
     protected String url;
 
-    public CrawlDatum(String url, byte status, byte fetchTime) {
+    public CrawlDatum(String url, byte status, long fetchTime) {
         this.status = status;
         this.fetchTime = fetchTime;
         this.url = url;
