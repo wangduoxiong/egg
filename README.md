@@ -12,3 +12,15 @@ Egg
 * 多线程。
 * 还在发育升级中...
 
+### 协议
+遵循[Apache 2.0协议](http://opensource.org/licenses/Apache-2.0)
+
+### 贡献者
+向下面提交过代码的同学表示感谢(哈哈，就我啦)
+* [Andrew](http://www.github.com/wangduoxiong)
+
+### 邮件交流
+王捉熊[630841816@qq.com]()
+
+### QQ
+630841816
