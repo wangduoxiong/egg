@@ -1,5 +1,5 @@
 /*
- *Copyright (c) 2015 Andrew-Wang.
+ *Copyright (c) 2015 Andrew-Wang. 
  *
  *Licensed under the Apache License, Version 2.0 (the "License");
  *you may not use this file except in compliance with the License.
@@ -13,17 +13,25 @@
  *See the License for the specific language governing permissions and
  *limitations under the License.
  */
-package edu.xiyou.andrew.Egg.net;
+package edu.xiyou.andrew.Egg.parse;
 
+import edu.xiyou.andrew.Egg.net.Response;
 
 /**
- * 进行链接请求的基础接口
- * Created by andrew on 15-1-31.
+ * 网页被爬取之后所执行的操作有这个接口规定
+ * Created by andrew on 15-2-3.
  */
-public interface Request {
+public interface Handler {
 
     /**
-     * @return
+     * 抓取成功的操作
+     * @param response
      */
-    public Response getResponse() throws Exception;
+    public void onFailed(Response response);
+
+    /**
+     * 抓取失败的操作
+     * @param response
+     */
+    public void onSuccess(Response response);
 }

@@ -21,6 +21,7 @@ import edu.xiyou.andrew.Egg.generator.StardardGenerator;
 import edu.xiyou.andrew.Egg.net.CrawlDatum;
 import edu.xiyou.andrew.Egg.parse.filter.BloomFilter;
 import edu.xiyou.andrew.Egg.persistence.BerkeleyWrite;
+import edu.xiyou.andrew.Egg.utils.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,8 +38,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * Created by andrew on 15-2-2.
  */
 public class QueueScheduler implements Scheduler{
-    private static int queueSize = 100;
-    private static long maxSize = 1000 * 1000;
+    private static int queueSize = Config.queueSize;
+    private static long maxSize = Config.MAX_ZIZE;
     protected static AtomicLong pushNum = new AtomicLong(0);
     protected static AtomicLong pullNum = new AtomicLong(0);
     private BlockingQueue<CrawlDatum> queue = new ArrayBlockingQueue<CrawlDatum>(queueSize);
@@ -118,6 +119,7 @@ public class QueueScheduler implements Scheduler{
                 empty.await();
             }
             datum = queue.take();
+            pullNum.incrementAndGet();
             full.signal();
         }finally {
             lock.unlock();

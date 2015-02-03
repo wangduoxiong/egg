@@ -15,24 +15,25 @@
  */
 package edu.xiyou.andrew.Egg.net;
 
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.*;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by andrew on 15-1-31.
  */
 public class HttpResponse implements Response{
-
-    protected CloseableHttpResponse response;
+    protected CrawlDatum datum;
+    protected Header[] headers;
+    protected StatusLine statusLine;
     protected HttpEntity entity;
+    protected ProtocolVersion version;
 
-    public HttpResponse(CloseableHttpResponse response){
-        this.response = response;
-        entity = response.getEntity();
+    public HttpResponse(CrawlDatum datum) {
+        this.datum = datum;
     }
 
     @Override
@@ -42,23 +43,51 @@ public class HttpResponse implements Response{
 
     @Override
     public Header[] getAllHeades() {
-        return response.getAllHeaders();
+        return headers;
     }
 
     @Override
     public Header[] getHeader(String name) {
-        return response.getHeaders(name);
-    }
-
-    public void close(){
-        if (response != null){
-            try {
-                response.close();
-            } catch (IOException e) {
-
-            }finally {
-                response = null;
+        List<Header> list = new LinkedList<Header>();
+        for (Header header : headers){
+            if (header.equals(name)){
+                list.add(header);
             }
         }
+        return (Header[])list.toArray();
     }
+
+    public Header[] getHeaders() {
+        return headers;
+    }
+
+    public void setHeaders(Header[] headers) {
+        this.headers = headers;
+    }
+
+    public StatusLine getStatusLine() {
+        return statusLine;
+    }
+
+    public void setStatusLine(StatusLine statusLine) {
+        this.statusLine = statusLine;
+    }
+
+    public HttpEntity getEntity() {
+        return entity;
+    }
+
+    public void setEntity(HttpEntity entity) {
+        this.entity = entity;
+    }
+
+    public ProtocolVersion getVersion() {
+        return version;
+    }
+
+    public void setVersion(ProtocolVersion version) {
+        this.version = version;
+    }
+
+
 }

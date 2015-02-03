@@ -15,9 +15,7 @@
  */
 package edu.xiyou.andrew.Egg.net;
 
-import edu.xiyou.andrew.Egg.net.type.Html;
 import org.apache.http.*;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -53,49 +51,62 @@ public class HttpRequest implements Request{
         client = HttpClients.createDefault();
     }
 
-    @Override
-    public CloseableHttpResponse getResponse() throws IOException {
+    public HttpRequest() {
+    }
 
+    @Override
+    public HttpResponse getResponse() throws IOException {
+        HttpResponse  result = new HttpResponse(datum);
         RequestConfig requestConfig = getRequestConfig();
 
         String url = datum.getUrl();
         HttpGet httpGet = new HttpGet(url);
         httpGet.setConfig(requestConfig);
         CloseableHttpResponse response = client.execute(httpGet);
-        int statusCode = response.getStatusLine().getStatusCode();
+        try {
+            int statusCode = response.getStatusLine().getStatusCode();
 
-        for (int i = 0; (i < redirect) && ((statusCode == HttpStatus.SC_MOVED_TEMPORARILY)
-                  || (statusCode == HttpStatus.SC_MOVED_PERMANENTLY)
-                  || (statusCode == HttpStatus.SC_SEE_OTHER)
-                  || (statusCode == HttpStatus.SC_TEMPORARY_REDIRECT)); i++){
-            Header header = response.getFirstHeader("location");
-            if (header != null) {
-                String newUrl = header.getValue();
-                if ((newUrl != null) && (newUrl.length() >= 7) && (!newUrl.equals(""))){
-                    HttpGet get = new HttpGet(newUrl);
-                    get.setConfig(requestConfig);
+            for (int i = 0; (i < redirect) && ((statusCode == HttpStatus.SC_MOVED_TEMPORARILY)
+                    || (statusCode == HttpStatus.SC_MOVED_PERMANENTLY)
+                    || (statusCode == HttpStatus.SC_SEE_OTHER)
+                    || (statusCode == HttpStatus.SC_TEMPORARY_REDIRECT)); i++) {
+                Header header = response.getFirstHeader("location");
+                if (header != null) {
+                    String newUrl = header.getValue();
+                    if ((newUrl != null) && (newUrl.length() >= 7) && (!newUrl.equals(""))) {
+                        HttpGet get = new HttpGet(newUrl);
+                        get.setConfig(requestConfig);
 
-                    response = client.execute(get);
-                    statusCode = response.getStatusLine().getStatusCode();
-                }else {
+                        response = client.execute(get);
+                        statusCode = response.getStatusLine().getStatusCode();
+                    } else {
+                        break;
+                    }
+                } else {
                     break;
                 }
-            }else {
-                break;
             }
+            if (response != null) {
+                result.setEntity(response.getEntity());
+                result.setHeaders(response.getAllHeaders());
+                result.setStatusLine(response.getStatusLine());
+                result.setVersion(response.getProtocolVersion());
+            }
+            datum.setFetchTime(System.currentTimeMillis());
+            datum.setStatus(CrawlDatum.CRAWLDATUM_FETHED);
+            return result;
+        }finally {
+            response.close();
         }
-        datum.setFetchTime(System.currentTimeMillis());
-        datum.setStatus(CrawlDatum.CRAWLDATUM_FETHED);
-        return response;
 
     }
 
-    public CloseableHttpResponse getPostResponse(List<NameValuePair> nvps) throws IOException{
+    public HttpResponse getPostResponse(List<NameValuePair> nvps) throws IOException{
         // 将要POST的数据封包
 //        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 //        nvps.add(new BasicNameValuePair("username", "vip"));
 //        nvps.add(new BasicNameValuePair("password", "123456"));
-
+        HttpResponse result = new HttpResponse(datum);
         RequestConfig requestConfig = getRequestConfig();
         String url = datum.getUrl();
         HttpPost post = new HttpPost(url);
@@ -103,12 +114,24 @@ public class HttpRequest implements Request{
         post.setConfig(requestConfig);
 
         CloseableHttpResponse response = client.execute(post);
-        datum.setFetchTime(System.currentTimeMillis());
-        datum.setStatus(CrawlDatum.CRAWLDATUM_FETHED);
-        return response;
+        try {
+            datum.setFetchTime(System.currentTimeMillis());
+            datum.setStatus(CrawlDatum.CRAWLDATUM_FETHED);
+
+            if (response != null) {
+                result.setStatusLine(response.getStatusLine());
+                result.setHeaders(response.getAllHeaders());
+                result.setEntity(response.getEntity());
+                result.setVersion(response.getProtocolVersion());
+            }
+            return result;
+        }finally {
+            response.close();
+        }
     }
 
-    public CloseableHttpResponse getPostResponseWithContext(List<NameValuePair>nvps) throws IOException {
+    public HttpResponse getPostResponseWithContext(List<NameValuePair>nvps) throws IOException {
+        HttpResponse result = new HttpResponse(datum);
         RequestConfig requestConfig = getRequestConfig();
         String url = datum.getUrl();
         HttpPost post = new HttpPost(url);
@@ -116,9 +139,20 @@ public class HttpRequest implements Request{
         post.setConfig(requestConfig);
 
         CloseableHttpResponse response = client.execute(post, clientContext);
-        datum.setFetchTime(System.currentTimeMillis());
-        datum.setStatus(CrawlDatum.CRAWLDATUM_FETHED);
-        return response;
+        try {
+            datum.setFetchTime(System.currentTimeMillis());
+            datum.setStatus(CrawlDatum.CRAWLDATUM_FETHED);
+
+            if (response != null) {
+                result.setStatusLine(response.getStatusLine());
+                result.setVersion(response.getProtocolVersion());
+                result.setHeaders(response.getAllHeaders());
+                result.setEntity(response.getEntity());
+            }
+            return result;
+        }finally {
+            response.close();
+        }
     }
 
     private RequestConfig getRequestConfig(){
@@ -176,4 +210,11 @@ public class HttpRequest implements Request{
         this.clientContext = clientContext;
     }
 
+    public CrawlDatum getDatum() {
+        return datum;
+    }
+
+    public void setDatum(CrawlDatum datum) {
+        this.datum = datum;
+    }
 }

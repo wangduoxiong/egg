@@ -17,7 +17,6 @@ package edu.xiyou.andrew.Egg.net;
 
 import org.apache.http.Header;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 /**

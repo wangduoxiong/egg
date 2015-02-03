@@ -16,6 +16,7 @@
 package edu.xiyou.andrew.Egg.persistence;
 
 import com.sleepycat.je.*;
+import edu.xiyou.andrew.Egg.utils.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +34,7 @@ public class BerkeleyDBUpdate {
     protected Environment environment = null;
     protected Database crawlDB = null;
     private static Logger logger = LoggerFactory.getLogger(BerkeleyDBUpdate.class);
-    private long interval = -1;                 //相同事件爬取的间隔时间 -1 代表不重复爬取
+    private long interval = Config.interval;                 //相同事件爬取的间隔时间 -1 代表不重复爬取
 
     public BerkeleyDBUpdate(Environment environment){
         this.environment = environment;
