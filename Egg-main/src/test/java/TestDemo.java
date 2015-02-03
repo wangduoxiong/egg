@@ -13,24 +13,20 @@
  *See the License for the specific language governing permissions and
  *limitations under the License.
  */
-package edu.xiyou.andrew.Egg.parse;
+import edu.xiyou.andrew.Egg.persistence.BerkeleyWrite;
 
-import edu.xiyou.andrew.Egg.net.CrawlDatum;
+import java.nio.ByteBuffer;
 
 /**
- * 存入队列的链接和取出链接的接口
  * Created by andrew on 15-2-2.
  */
-public interface Scheduler {
-    /**
-     * 将一个任务存入队列
-     * @param datum
-     */
-    public void push(CrawlDatum datum);
+public class TestDemo {
+    private int a = 3;
+    {
+        System.out.println(a);
+    }
 
-    /**
-     * 取出一个任务
-     * @return
-     */
-    public CrawlDatum pull();
+    public static void main(String[] args){
+        new TestDemo();
+    }
 }

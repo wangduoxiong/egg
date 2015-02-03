@@ -1,3 +1,18 @@
+/*
+ *Copyright (c) 2015 Andrew-Wang.
+ *
+ *Licensed under the Apache License, Version 2.0 (the "License");
+ *you may not use this file except in compliance with the License.
+ *You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *Unless required by applicable law or agreed to in writing, software
+ *distributed under the License is distributed on an "AS IS" BASIS,
+ *WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *See the License for the specific language governing permissions and
+ *limitations under the License.
+ */
 package edu.xiyou.andrew.Egg.parse;
 
 import com.sleepycat.je.Environment;
@@ -17,6 +32,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
+ * 任务的抓取队列
+ * 当任务push时，直接存入数据库
  * Created by andrew on 15-2-2.
  */
 public class QueueScheduler implements Scheduler{

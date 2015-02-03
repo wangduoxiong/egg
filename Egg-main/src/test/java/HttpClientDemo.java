@@ -13,24 +13,14 @@
  *See the License for the specific language governing permissions and
  *limitations under the License.
  */
-package edu.xiyou.andrew.Egg.parse;
-
-import edu.xiyou.andrew.Egg.net.CrawlDatum;
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 /**
- * 存入队列的链接和取出链接的接口
- * Created by andrew on 15-2-2.
+ * Created by andrew on 15-1-31.
  */
-public interface Scheduler {
-    /**
-     * 将一个任务存入队列
-     * @param datum
-     */
-    public void push(CrawlDatum datum);
+public class HttpClientDemo {
+    public static void main(String[] args){
 
-    /**
-     * 取出一个任务
-     * @return
-     */
-    public CrawlDatum pull();
+    }
 }
