@@ -35,9 +35,11 @@ public class BerkeleyDBUpdate {
     protected Database crawlDB = null;
     private static Logger logger = LoggerFactory.getLogger(BerkeleyDBUpdate.class);
     private long interval = Config.interval;                 //相同事件爬取的间隔时间 -1 代表不重复爬取
+    private BerkeleyWrite write;
 
     public BerkeleyDBUpdate(Environment environment){
         this.environment = environment;
+        this.write = new BerkeleyWrite(environment);
     }
 
     public void writeInfo(Map<DatabaseEntry, DatabaseEntry> map){
@@ -97,7 +99,7 @@ public class BerkeleyDBUpdate {
         try {
             Database crawlDB = BerkeleyDBFactory.createDB(environment, "crawlDB");
             Database linkDB = BerkeleyDBFactory.createDB(environment, "linkDB");
-            Database visitedDB = BerkeleyDBFactory.createDB(environment, "visited");
+            Database visitedDB = BerkeleyDBFactory.createDB(environment, "visitedDB");
             logger.info("create databases success");
             Cursor visitedCurser = visitedDB.openCursor(null, null);
             DatabaseEntry keyEntry = new DatabaseEntry();
@@ -129,11 +131,19 @@ public class BerkeleyDBUpdate {
                 linkCursor.close();
                 linkDB.close();
             }
+            if (crawlDB != null){
+                crawlDB.close();
+            }
             logger.info("end merge");
-        }finally {
-            environment.removeDatabase(null, "linkDB");
+            //environment.removeDatabase(null, "linkDB");
             logger.info("remove link database");
-            crawlDB.close();
+        }catch (Exception e){
+            logger.info("Exception: " + e, new Exception());
         }
+
+    }
+
+    public BerkeleyWrite getWrite() {
+        return write;
     }
 }

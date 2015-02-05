@@ -68,7 +68,7 @@ public class BloomFilter<E> implements Serializable, Filter<E> {
     }
 
     /**
-     * @param bitSetSize                      布隆过滤器的bit大小
+     * @param bitSetSize                      布隆过滤器的bit 大小
      * @param expectedNumberOffFilterElements 能够加入过滤器元素的最大个数
      */
 

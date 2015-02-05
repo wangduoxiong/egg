@@ -16,6 +16,7 @@
 package edu.xiyou.andrew.Egg.net;
 
 import org.apache.http.Header;
+import org.apache.http.StatusLine;
 
 import java.io.InputStream;
 
@@ -33,4 +34,6 @@ public interface Response {
     public Header[] getAllHeades();
 
     public Header[] getHeader(String name);
+
+    public StatusLine getStatusLine();
 }

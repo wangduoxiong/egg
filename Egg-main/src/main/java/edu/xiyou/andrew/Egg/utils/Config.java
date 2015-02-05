@@ -31,4 +31,14 @@ public class Config {
     public static int queueSize = 100;                      //存取取出任务的队列大小
 
     public static long interval = -1;                       //相同任务爬取的时间间隔
+
+    public static int socketTimeOut = 3000;
+
+    public static int connectTimeOut = 3000;
+
+    public static int redirect = 3;
+
+    public static int threads = 1;                         //线程数量
+
+    public static long WAIT_THREAD_END_TIME=1000*60;
 }

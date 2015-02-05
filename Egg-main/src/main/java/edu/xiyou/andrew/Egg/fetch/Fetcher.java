@@ -66,7 +66,7 @@ public class Fetcher {
 
             System.out.println("FetcherThread  running: " + running);
             while (running) {
-                datum = scheduler.pull();
+                datum = scheduler.getGenerator().next();
 
                 System.out.println("FetcherThread " + datum);
                 hasMore = (datum != null);
@@ -104,7 +104,7 @@ public class Fetcher {
                             logger.info("Exception: " + e, new Exception());
                         } finally {
                         }
-                        datum = scheduler.pull();
+                        datum = scheduler.getGenerator().next();
                         hasMore = (datum != null);
                         if (hasMore)
                         System.out.println(datum);

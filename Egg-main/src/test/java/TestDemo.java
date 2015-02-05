@@ -16,17 +16,55 @@
 import edu.xiyou.andrew.Egg.persistence.BerkeleyWrite;
 
 import java.nio.ByteBuffer;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by andrew on 15-2-2.
  */
 public class TestDemo {
-    private int a = 3;
-    {
-        System.out.println(a);
+
+    private Lock lock = new ReentrantLock();
+    private Condition echo = lock.newCondition();
+
+    private void createThread(){
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                lock.lock();
+                try {
+                    int i = 0;
+                        System.out.println("---->  " + (i++));
+
+                } finally {
+                    lock.unlock();
+                }
+            }
+        });
+        thread.start();
     }
 
-    public static void main(String[] args){
-        new TestDemo();
+    private void other(){
+        lock.lock();
+        try {
+            int i = 0;
+            while (i < 12) {
+                System.out.println("   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  " + i);
+                i++;
+                if (i % 3 == 0){
+                    createThread();
+                }
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public static void main(String[] args) {
+        TestDemo demo = new TestDemo();
+        demo.other();
     }
 }

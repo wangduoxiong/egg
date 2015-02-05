@@ -42,14 +42,16 @@ public class StardardGenerator implements Generator{
     }
 
     @Override
-    public CrawlDatum next() {
+    public synchronized CrawlDatum next() {
         DatabaseEntry keyEntry = new DatabaseEntry();
         DatabaseEntry valueEntry = new DatabaseEntry();
         byte[] value = new byte[9];
         long count = count();
 
+        logger.info("count: " + count);
         CrawlDatum datum = null;
-        while ((tatol.get() < count) || (cursor.getNext(keyEntry, valueEntry, LockMode.DEFAULT) == OperationStatus.SUCCESS)){
+        while ((tatol.get() < count) && (cursor.getNext(keyEntry, valueEntry, LockMode.DEFAULT) == OperationStatus.SUCCESS)){
+            logger.info(" generator...");
             tatol.incrementAndGet();
             value = valueEntry.getData();
             datum = new CrawlDatum(new String(keyEntry.getData()), value[0], BerkeleyWrite.bytes2Long(value, 1));
@@ -63,5 +65,9 @@ public class StardardGenerator implements Generator{
 
     public long count(){
         return crawlDB.count();
+    }
+
+    public static long getTatol() {
+        return tatol.get();
     }
 }

@@ -41,6 +41,7 @@ public class ThreadPool {
     {
         lock = new ReentrantLock();
         condition = lock.newCondition();
+        threadLive = new AtomicInteger(0);
     }
 
     public ThreadPool(int poolSize, ExecutorService service){

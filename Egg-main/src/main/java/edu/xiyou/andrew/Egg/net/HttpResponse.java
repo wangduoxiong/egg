@@ -65,6 +65,7 @@ public class HttpResponse implements Response{
         this.headers = headers;
     }
 
+    @Override
     public StatusLine getStatusLine() {
         return statusLine;
     }
@@ -89,5 +90,7 @@ public class HttpResponse implements Response{
         this.version = version;
     }
 
-
+    public CrawlDatum getDatum() {
+        return datum;
+    }
 }

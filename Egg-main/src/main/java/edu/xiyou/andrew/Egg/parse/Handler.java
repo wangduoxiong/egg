@@ -15,7 +15,10 @@
  */
 package edu.xiyou.andrew.Egg.parse;
 
+import edu.xiyou.andrew.Egg.net.CrawlDatum;
 import edu.xiyou.andrew.Egg.net.Response;
+
+import java.util.List;
 
 /**
  * 网页被爬取之后所执行的操作有这个接口规定
@@ -34,4 +37,6 @@ public interface Handler {
      * @param response
      */
     public void onSuccess(Response response);
+
+    public List<CrawlDatum> handleAndGetLinks(Response response);
 }

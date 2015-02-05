@@ -15,6 +15,7 @@
  */
 package edu.xiyou.andrew.Egg.net;
 
+import edu.xiyou.andrew.Egg.utils.Config;
 import org.apache.http.*;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
@@ -40,9 +41,9 @@ public class HttpRequest implements Request{
     private CloseableHttpClient client;
     private String cookie;
     private HttpHost proxy;
-    private int socketTimeOut = 3000;
-    private int connectTimeOut = 3000;
-    private int redirect = 3;
+    private int socketTimeOut = Config.socketTimeOut;
+    private int connectTimeOut = Config.connectTimeOut;
+    private int redirect = Config.redirect;
     private HttpClientContext clientContext = new HttpClientContext();
 
 
@@ -52,6 +53,7 @@ public class HttpRequest implements Request{
     }
 
     public HttpRequest() {
+        client = HttpClients.createDefault();
     }
 
     @Override
@@ -62,7 +64,9 @@ public class HttpRequest implements Request{
         String url = datum.getUrl();
         HttpGet httpGet = new HttpGet(url);
         httpGet.setConfig(requestConfig);
+
         CloseableHttpResponse response = client.execute(httpGet);
+
         try {
             int statusCode = response.getStatusLine().getStatusCode();
 
@@ -86,19 +90,24 @@ public class HttpRequest implements Request{
                     break;
                 }
             }
+
             if (response != null) {
                 result.setEntity(response.getEntity());
                 result.setHeaders(response.getAllHeaders());
                 result.setStatusLine(response.getStatusLine());
                 result.setVersion(response.getProtocolVersion());
             }
+
             datum.setFetchTime(System.currentTimeMillis());
             datum.setStatus(CrawlDatum.CRAWLDATUM_FETHED);
-            return result;
+
+        }catch (Exception e){
+            LOG.info("Exception: " + e);
         }finally {
+
             response.close();
         }
-
+        return result;
     }
 
     public HttpResponse getPostResponse(List<NameValuePair> nvps) throws IOException{
@@ -115,15 +124,14 @@ public class HttpRequest implements Request{
 
         CloseableHttpResponse response = client.execute(post);
         try {
-            datum.setFetchTime(System.currentTimeMillis());
-            datum.setStatus(CrawlDatum.CRAWLDATUM_FETHED);
-
             if (response != null) {
                 result.setStatusLine(response.getStatusLine());
                 result.setHeaders(response.getAllHeaders());
                 result.setEntity(response.getEntity());
                 result.setVersion(response.getProtocolVersion());
             }
+            datum.setFetchTime(System.currentTimeMillis());
+            datum.setStatus(CrawlDatum.CRAWLDATUM_FETHED);
             return result;
         }finally {
             response.close();
@@ -140,15 +148,14 @@ public class HttpRequest implements Request{
 
         CloseableHttpResponse response = client.execute(post, clientContext);
         try {
-            datum.setFetchTime(System.currentTimeMillis());
-            datum.setStatus(CrawlDatum.CRAWLDATUM_FETHED);
-
             if (response != null) {
                 result.setStatusLine(response.getStatusLine());
                 result.setVersion(response.getProtocolVersion());
                 result.setHeaders(response.getAllHeaders());
                 result.setEntity(response.getEntity());
             }
+            datum.setFetchTime(System.currentTimeMillis());
+            datum.setStatus(CrawlDatum.CRAWLDATUM_FETHED);
             return result;
         }finally {
             response.close();

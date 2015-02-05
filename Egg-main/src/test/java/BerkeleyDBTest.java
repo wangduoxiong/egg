@@ -14,6 +14,7 @@
  *limitations under the License.
  */
 import com.sleepycat.je.*;
+import edu.xiyou.andrew.Egg.persistence.BerkeleyDBFactory;
 
 import java.io.File;
 
@@ -194,4 +195,14 @@ public class BerkeleyDBTest {
 //        System.out.println(a);
 //
 //    }
+
+    public static void main(String[] args) {
+        EnvironmentConfig environmentConfig1 = new EnvironmentConfig();
+        environmentConfig1.setAllowCreate(true);
+        environmentConfig1.setTransactional(false);
+        environment = new Environment(new File("/home/andrew/EggTest/"), environmentConfig1);
+        database = BerkeleyDBFactory.createDB(environment, "visitedDB");
+        Database linkDB = BerkeleyDBFactory.createDB(environment, "linkDB");
+
+    }
 }

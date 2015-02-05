@@ -20,6 +20,7 @@ import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.Environment;
 import edu.xiyou.andrew.Egg.net.CrawlDatum;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -46,8 +47,8 @@ public class BerkeleyWrite {
     public void init(){
         linkNum = new AtomicLong(0);
         visitedNum = new AtomicLong(0);
-        linkDB = BerkeleyDBFactory.createDB(environment, "linkDB");
         visitedDB = BerkeleyDBFactory.createDB(environment, "visitedDB");
+        linkDB = BerkeleyDBFactory.createDB(environment, "linkDB");
     }
 
     public void writeLink(CrawlDatum datum){
@@ -55,6 +56,12 @@ public class BerkeleyWrite {
                 (datum.getUrl().length() < 7)){
             return;
         }
+
+
+        System.out.println("link: " + datum);
+
+
+
         DatabaseEntry keyEntry = new DatabaseEntry(datum.getUrl().getBytes());
         DatabaseEntry valueEntry = new DatabaseEntry();
         byte[] bytes = new byte[9];
@@ -62,6 +69,15 @@ public class BerkeleyWrite {
         BerkeleyWrite.long2Bytes(datum.getFetchTime(), bytes, 1);
         valueEntry.setData(bytes);
         linkDB.put(null, keyEntry, valueEntry);
+    }
+
+    public void writeLink(List<CrawlDatum> datums){
+        if ((datums == null) || (datums.size()==0)){
+            return;
+        }
+        for (CrawlDatum datum : datums) {
+            writeLink(datum);
+        }
     }
 
     public void writeVisited(CrawlDatum datum){

@@ -52,7 +52,7 @@ public class BerkeleyDBFactory {
     public static DatabaseConfig defaultDatabaseConfig(){
         DatabaseConfig databaseConfig = new DatabaseConfig();
         databaseConfig.setAllowCreate(true);
-        databaseConfig.setTransactional(false);
+        databaseConfig.setDeferredWrite(true);
 
         return databaseConfig;
     }
