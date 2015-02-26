@@ -19,6 +19,7 @@ package edu.xiyou.andrew.Egg.cralwer;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
 import edu.xiyou.andrew.Egg.fetch.Fetcher;
+import edu.xiyou.andrew.Egg.generator.StardardGenerator;
 import edu.xiyou.andrew.Egg.net.CrawlDatum;
 import edu.xiyou.andrew.Egg.net.HttpRequest;
 import edu.xiyou.andrew.Egg.parse.Handler;
@@ -41,6 +42,7 @@ public class Crawler{
     protected Environment environment;
     protected int depth;
     protected HttpRequest request;
+    protected StardardGenerator generator;
 
     protected Handler handler;
     protected String crawlPath;
@@ -104,6 +106,7 @@ public class Crawler{
         environmentConfig.setAllowCreate(true);
         environment = new Environment(path, environmentConfig);
         Scheduler scheduler = new QueueScheduler(environment);
+        generator = new StardardGenerator(environment);
 
         for (String url : seeds){
             scheduler.push(new CrawlDatum(url));
@@ -116,8 +119,8 @@ public class Crawler{
             fetcher = new Fetcher(environment);
             fetcher.setHandler(handler);
             fetcher.setRequest(request);
-            fetcher.fetch();
-            //fetcher.test();
+            fetcher.fetch(generator);
+//            fetcher.test(generator);
         }
     }
 

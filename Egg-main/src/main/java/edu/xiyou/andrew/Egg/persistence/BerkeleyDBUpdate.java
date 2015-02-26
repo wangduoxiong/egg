@@ -31,10 +31,10 @@ import static com.sleepycat.je.LockMode.DEFAULT;
  * Created by andrew on 15-2-1.
  */
 public class BerkeleyDBUpdate {
-    protected Environment environment = null;
-    protected Database crawlDB = null;
     private static Logger logger = LoggerFactory.getLogger(BerkeleyDBUpdate.class);
-    private long interval = Config.interval;                 //相同事件爬取的间隔时间 -1 代表不重复爬取
+
+    protected Environment environment = null;
+    protected Database lockDatabase;
     private BerkeleyWrite write;
 
     public BerkeleyDBUpdate(Environment environment){
@@ -42,54 +42,41 @@ public class BerkeleyDBUpdate {
         this.write = new BerkeleyWrite(environment);
     }
 
-    public void writeInfo(Map<DatabaseEntry, DatabaseEntry> map){
-        if (map == null){
-            return;
-        }
-        Database infoDB = BerkeleyDBFactory.createDB(environment, "infoDB");
-        try {
-            Set<Map.Entry<DatabaseEntry, DatabaseEntry>> entrySet = map.entrySet();
-            for (Map.Entry<DatabaseEntry, DatabaseEntry> entry : entrySet) {
-                infoDB.put(null, entry.getKey(), entry.getValue());
-            }
-        }finally {
-            infoDB.sync();
-            infoDB.close();
-            infoDB = null;
-        }
-    }
-
     public void lock(){
+        lockDatabase = BerkeleyDBFactory.createDB(environment, "lock");
         DatabaseEntry keyEntry = new DatabaseEntry("lock".getBytes());
         DatabaseEntry valueEntry = new DatabaseEntry("locked".getBytes());
-        Map<DatabaseEntry, DatabaseEntry> map = new HashMap<DatabaseEntry, DatabaseEntry>(1);
-        map.put(keyEntry, valueEntry);
-        writeInfo(map);
+        lockDatabase.put(null, keyEntry, valueEntry);
+        lockDatabase.sync();
+        lockDatabase.close();
+        lockDatabase = null;
     }
 
     public void unlock(){
+        lockDatabase = BerkeleyDBFactory.createDB(environment, "lock");
         DatabaseEntry keyEntry = new DatabaseEntry("lock".getBytes());
         DatabaseEntry valueEntry = new DatabaseEntry("unlock".getBytes());
-        Map<DatabaseEntry, DatabaseEntry>map = new HashMap<DatabaseEntry, DatabaseEntry>(1);
-        map.put(keyEntry, valueEntry);
-        writeInfo(map);
+        lockDatabase.put(null, keyEntry, valueEntry);
+        lockDatabase.sync();
+        lockDatabase.close();
+        lockDatabase = null;
     }
 
     public boolean islock(){
-        Database infoDB = BerkeleyDBFactory.createDB(environment, "infoDB");
+        boolean islock = false;
+        lockDatabase = BerkeleyDBFactory.createDB(environment, "lock");
         DatabaseEntry keyEntry = new DatabaseEntry("lock".getBytes());
         DatabaseEntry valueEntry = new DatabaseEntry();
         try {
-            if (infoDB.get(null, keyEntry, valueEntry, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+            if (lockDatabase.get(null, keyEntry, valueEntry, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
                 String info = new String(valueEntry.getData());
-                if (info.equals("lock")) {
+                if (info.equals("locked")) {
                     return true;
                 }
             }
         }finally {
-            infoDB.sync();
-            infoDB.close();
-            infoDB = null;
+            lockDatabase.close();
+            lockDatabase = null;
         }
         return false;
     }
@@ -107,10 +94,11 @@ public class BerkeleyDBUpdate {
 
             try {
                 logger.info("merge visited database");
-                if (interval != -1) {
+                if (Config.interval != -1) {
                     while (visitedCurser.getNext(keyEntry, valueEntry, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
-                        if ((System.currentTimeMillis() - BerkeleyWrite.bytes2Long(valueEntry.getData(), 1)) > interval) {
+                        if ((System.currentTimeMillis() - BerkeleyWrite.bytes2Long(valueEntry.getData(), 1)) > Config.interval) {
                             crawlDB.put(null, keyEntry, valueEntry);
+                            visitedCurser.delete();
                         }
                     }
                 }
@@ -125,6 +113,7 @@ public class BerkeleyDBUpdate {
                 logger.info("merge link database");
                 while (linkCursor.getNext(keyEntry, valueEntry, LockMode.DEFAULT) == OperationStatus.SUCCESS){
                     crawlDB.put(null, keyEntry, valueEntry);
+                    linkCursor.delete();
                 }
                 logger.info("merged link database");
             }finally {
@@ -141,6 +130,10 @@ public class BerkeleyDBUpdate {
             logger.info("Exception: " + e, new Exception());
         }
 
+    }
+
+    public void close(){
+        write.close();
     }
 
     public BerkeleyWrite getWrite() {

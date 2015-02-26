@@ -41,4 +41,6 @@ public class Config {
     public static int threads = 1;                         //线程数量
 
     public static long WAIT_THREAD_END_TIME=1000*60;
+
+    public static long requestMaxInterval = 1000 * 60 * 2;
 }

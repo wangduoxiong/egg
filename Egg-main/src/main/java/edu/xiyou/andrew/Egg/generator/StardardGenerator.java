@@ -30,19 +30,21 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class StardardGenerator implements Generator{
     private Environment environment;
-    private Database crawlDB;
-    private Cursor cursor;
+    private Database crawlDB = null;
+    private Cursor cursor = null;
     private static Logger logger = LoggerFactory.getLogger(StardardGenerator.class);
     private static AtomicLong tatol = new AtomicLong(0);       //目前产生的任务数量
 
     public StardardGenerator(Environment environment){
         this.environment = environment;
-        crawlDB = BerkeleyDBFactory.createDB(environment, "crawlDB");
-        cursor = crawlDB.openCursor(null, null);
     }
 
     @Override
     public synchronized CrawlDatum next() {
+        if (cursor == null) {
+            crawlDB = BerkeleyDBFactory.createDB(environment, "crawlDB");
+            cursor = crawlDB.openCursor(null, null);
+        }
         DatabaseEntry keyEntry = new DatabaseEntry();
         DatabaseEntry valueEntry = new DatabaseEntry();
         byte[] value = new byte[9];
@@ -50,17 +52,33 @@ public class StardardGenerator implements Generator{
 
         logger.info("count: " + count);
         CrawlDatum datum = null;
-        while ((tatol.get() < count) && (cursor.getNext(keyEntry, valueEntry, LockMode.DEFAULT) == OperationStatus.SUCCESS)){
-            logger.info(" generator...");
-            tatol.incrementAndGet();
-            value = valueEntry.getData();
-            datum = new CrawlDatum(new String(keyEntry.getData()), value[0], BerkeleyWrite.bytes2Long(value, 1));
-            if (datum != null){
-                return datum;
+        try {
+            while ((tatol.get() < count) && (cursor.getNext(keyEntry, valueEntry, LockMode.DEFAULT) == OperationStatus.SUCCESS)) {
+                logger.info(" generator...");
+                tatol.incrementAndGet();
+                value = valueEntry.getData();
+                datum = new CrawlDatum(new String(keyEntry.getData()), value[0], BerkeleyWrite.bytes2Long(value, 1));
+                if (datum != null) {
+                    return datum;
+                }
             }
+
+        }catch (DatabaseException e){
+            logger.info("DatabaseException " + e);
         }
 
         return datum;
+    }
+
+    public void close(){
+        if (cursor != null){
+            cursor.close();
+            cursor = null;
+        }
+        if (crawlDB != null){
+            crawlDB.close();
+            crawlDB = null;
+        }
     }
 
     public long count(){
