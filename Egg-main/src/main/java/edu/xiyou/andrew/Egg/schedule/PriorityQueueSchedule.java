@@ -19,19 +19,21 @@ package edu.xiyou.andrew.Egg.schedule;
 import edu.xiyou.andrew.Egg.parse.CrawlDatum;
 import edu.xiyou.andrew.Egg.schedule.persistent.DbUpdater;
 
+import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by andrew on 15-3-28.
+ * Created by andrew on 15-3-29.
  */
-public class QueueSchedule extends AbtractQueueSchedule{
+public class PriorityQueueSchedule extends AbtractQueueSchedule{
 
-    public QueueSchedule(DbUpdater updater){
+    public PriorityQueueSchedule(DbUpdater updater, Comparator<? extends CrawlDatum> comparator){
         this.updater = updater;
-        List<String> datums = updater.readFromDatums();
-        queue = new ArrayBlockingQueue<String>(datums.size(), false, datums);
+        List<String> urlList = updater.readFromDatums();
+        queue = new PriorityBlockingQueue<String>(urlList);
     }
+
 }

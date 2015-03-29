@@ -131,6 +131,11 @@ public class RedisDbUpdater implements DbUpdater{
         Thread.sleep(40);
         updater.write2Visited(map);
 
+        updater.write2Visted(new CrawlDatum("333", System.currentTimeMillis()));
+        Thread.sleep(20);
+        updater.write2Visted(new CrawlDatum("444", System.currentTimeMillis()));
+        Thread.sleep(40);
+
         updater.merge();
         System.out.println(updater.readFromDatums());
     }

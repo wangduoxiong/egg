@@ -16,11 +16,13 @@ package edu.xiyou.andrew.Egg.parse;
  * limitations under the License.
  */
 
+import java.util.Comparator;
+
 /**
  * 爬取任务的结构体
  * Created by andrew on 15-3-28.
  */
-public class CrawlDatum {
+public class CrawlDatum implements Comparable<CrawlDatum> {
     private String url;             //任务的url
     private long fetchTime;         //任务最后的爬取时间
 
@@ -49,5 +51,10 @@ public class CrawlDatum {
 
     public void setFetchTime(long fetchTime) {
         this.fetchTime = fetchTime;
+    }
+
+    @Override
+    public int compareTo(CrawlDatum datum) {
+        return url.compareTo(datum.url);
     }
 }
