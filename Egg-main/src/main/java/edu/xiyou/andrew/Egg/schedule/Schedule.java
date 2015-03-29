@@ -18,41 +18,37 @@ package edu.xiyou.andrew.Egg.schedule;
 
 import edu.xiyou.andrew.Egg.parse.CrawlDatum;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * 任务的取出和加入队列的接口
  * Created by andrew on 15-3-28.
  */
 public interface Schedule {
     /**
-     * 将任务加入数据库队列
-     * @param datum 加入的任务
-     * @throws Exception
-     */
-    public void push(CrawlDatum datum) throws Exception;
-
-    /**
-     * 从队列中取出并删除任务
+     * 从队列中取出任务,假如为空，返回null
      * @return 取出的任务
      * @throws Exception
      */
-    public CrawlDatum pull() throws Exception;
+    public CrawlDatum peek();
 
     /**
-     * 从队列中取出任务
-     * @return 取出的任务
-     * @throws Exception
-     */
-    public CrawlDatum peek() throws Exception;
-
-    /**
-     * 从队列中取出并删除任务
+     * 从队列中取出并删除任务，在必要时阻塞
      * @return 取出的任务
      */
-    public CrawlDatum take();
+    public CrawlDatum take() throws InterruptedException;
 
     /**
-     * 将任务加入数据库队列
+     * 将任务加入数据库队列，必要时阻塞
      * @param datum
      */
-    public void put(CrawlDatum datum);
+    public void put(CrawlDatum datum) throws InterruptedException;
+
+    /**
+     * 获取并删除头节点，加入为空返回null
+     * @return 取回的任务
+     */
+    public CrawlDatum poll(long time, TimeUnit unit) throws InterruptedException;
+
+    public int size();
 }
