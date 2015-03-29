@@ -16,8 +16,26 @@ package edu.xiyou.andrew.Egg.schedule.persistent;
  * limitations under the License.
  */
 
+import edu.xiyou.andrew.Egg.parse.CrawlDatum;
+
+import java.util.List;
+import java.util.Map;
+
 /**
  * Created by andrew on 15-3-28.
  */
 public interface DbUpdater {
+    public Map<String, String> readFromVisited();
+
+    public List<String> readFromLinks();
+
+    public List<String> readFromDatums();
+
+    public void write2Visted(CrawlDatum datum);
+
+    public void write2Visited(Map<String, String> map);
+
+    public void write2Datums(String... urls);
+
+    public void write2Links(String... urls);
 }

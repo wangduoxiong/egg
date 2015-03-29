@@ -36,6 +36,7 @@ public class RedisDbUpdater implements DbUpdater{
         jedis = RedisFactory.getRedisInstance();
     }
 
+    @Override
     public void write2Visted(CrawlDatum datum){
         if (datum == null){
             return;
@@ -44,10 +45,12 @@ public class RedisDbUpdater implements DbUpdater{
         jedis.hset("visited", datum.getUrl(), datum.getFetchTime() + "");
     }
 
+    @Override
     public void write2Visited(Map<String, String> map){
         jedis.hmset("visited", map);
     }
 
+    @Override
     public void write2Links(String... urls){
         for (String url : urls) {
             System.out.println(url);
@@ -55,22 +58,30 @@ public class RedisDbUpdater implements DbUpdater{
         }
     }
 
+    @Override
     public void write2Datums(String... urls){
         for (String url : urls){
             jedis.lpush("datums", url);
         }
     }
 
+    @Override
     public List<String> readFromLinks(){
         return jedis.lrange("links", 0, -1);
     }
 
+    @Override
     public List<String> readFromDatums(){
         return jedis.lrange("datums", 0, -1);
     }
 
+    @Override
     public Map<String, String> readFromVisited(){
         return jedis.hgetAll("visited");
+    }
+
+    public void delDatums(){
+        jedis.del("datums");
     }
 
     public void merge(){

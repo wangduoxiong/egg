@@ -24,13 +24,15 @@ public class CrawlDatum {
     private String url;             //任务的url
     private long fetchTime;         //任务最后的爬取时间
 
+    public final static long UNFETCH_TIME = 0;
+
     public CrawlDatum(String url, long fetchTime) {
         this.url = url;
         this.fetchTime = fetchTime;
     }
 
     public CrawlDatum(String url){
-        this(url, 0);
+        this(url, CrawlDatum.UNFETCH_TIME);
     }
 
     public String getUrl() {
