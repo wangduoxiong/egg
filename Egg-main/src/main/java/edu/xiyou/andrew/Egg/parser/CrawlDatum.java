@@ -1,4 +1,4 @@
-package edu.xiyou.andrew.Egg.parse;
+package edu.xiyou.andrew.Egg.parser;
 
 /*
  * Copyright (c) 2015 Andrew-Wang.
@@ -15,8 +15,6 @@ package edu.xiyou.andrew.Egg.parse;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import java.util.Comparator;
 
 /**
  * 爬取任务的结构体

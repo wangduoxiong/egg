@@ -1,4 +1,4 @@
-package edu.xiyou.andrew.Egg.schedule;
+package edu.xiyou.andrew.Egg.net;
 
 /*
  * Copyright (c) 2015 Andrew-Wang.
@@ -16,19 +16,16 @@ package edu.xiyou.andrew.Egg.schedule;
  * limitations under the License.
  */
 
-import edu.xiyou.andrew.Egg.schedule.persistent.DbUpdater;
-
-import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
+import edu.xiyou.andrew.Egg.parser.CrawlDatum;
 
 /**
- * Created by andrew on 15-3-28.
+ * Created by andrew on 15-3-29.
  */
-public class QueueSchedule extends AbtractQueueSchedule{
-
-    public QueueSchedule(DbUpdater updater){
-        this.updater = updater;
-        List<String> datums = updater.readFromDatums();
-        queue = new ArrayBlockingQueue<String>(datums.size(), false, datums);
-    }
+public interface Request {
+    /**
+     *
+     * @param datum
+     * @return
+     */
+    Response getResponse(CrawlDatum datum) throws Exception;
 }

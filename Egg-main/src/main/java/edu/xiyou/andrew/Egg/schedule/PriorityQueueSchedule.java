@@ -16,14 +16,12 @@ package edu.xiyou.andrew.Egg.schedule;
  * limitations under the License.
  */
 
-import edu.xiyou.andrew.Egg.parse.CrawlDatum;
+import edu.xiyou.andrew.Egg.parser.CrawlDatum;
 import edu.xiyou.andrew.Egg.schedule.persistent.DbUpdater;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by andrew on 15-3-29.

@@ -16,7 +16,7 @@ package edu.xiyou.andrew.Egg.schedule.persistent;
  * limitations under the License.
  */
 
-import edu.xiyou.andrew.Egg.parse.CrawlDatum;
+import edu.xiyou.andrew.Egg.parser.CrawlDatum;
 
 import java.util.List;
 import java.util.Map;

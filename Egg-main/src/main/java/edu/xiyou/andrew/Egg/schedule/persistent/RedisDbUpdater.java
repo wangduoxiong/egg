@@ -16,9 +16,8 @@ package edu.xiyou.andrew.Egg.schedule.persistent;
  * limitations under the License.
  */
 
-import edu.xiyou.andrew.Egg.parse.CrawlDatum;
+import edu.xiyou.andrew.Egg.parser.CrawlDatum;
 import edu.xiyou.andrew.Egg.utils.Config;
-import edu.xiyou.andrew.Egg.utils.NumberTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;

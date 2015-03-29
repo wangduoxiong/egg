@@ -16,7 +16,7 @@ package edu.xiyou.andrew.Egg.schedule;
  * limitations under the License.
  */
 
-import edu.xiyou.andrew.Egg.parse.CrawlDatum;
+import edu.xiyou.andrew.Egg.parser.CrawlDatum;
 
 import java.util.concurrent.TimeUnit;
 
