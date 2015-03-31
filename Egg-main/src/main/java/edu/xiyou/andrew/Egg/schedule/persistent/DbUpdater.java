@@ -25,6 +25,10 @@ import java.util.Map;
  * Created by andrew on 15-3-28.
  */
 public interface DbUpdater {
+    final static String VISITED_DB = "visited";
+    final static String DATUMS_DB = "datums";
+    final static String LINKS_DB = "links";
+
     public Map<String, String> readFromVisited();
 
     public List<String> readFromLinks();
@@ -38,4 +42,6 @@ public interface DbUpdater {
     public void write2Datums(String... urls);
 
     public void write2Links(String... urls);
+
+    public void merge();
 }

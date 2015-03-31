@@ -41,63 +41,64 @@ public class RedisDbUpdater implements DbUpdater{
             return;
         }
 
-        jedis.hset("visited", datum.getUrl(), datum.getFetchTime() + "");
+        jedis.hset(DbUpdater.VISITED_DB, datum.getUrl(), datum.getFetchTime() + "");
     }
 
     @Override
     public void write2Visited(Map<String, String> map){
-        jedis.hmset("visited", map);
+        jedis.hmset(DbUpdater.VISITED_DB, map);
     }
 
     @Override
     public void write2Links(String... urls){
         for (String url : urls) {
             System.out.println(url);
-            jedis.lpush("links", url);
+            jedis.lpush(DbUpdater.LINKS_DB, url);
         }
     }
 
     @Override
     public void write2Datums(String... urls){
         for (String url : urls){
-            jedis.lpush("datums", url);
+            jedis.lpush(DbUpdater.DATUMS_DB, url);
         }
     }
 
     @Override
     public List<String> readFromLinks(){
-        return jedis.lrange("links", 0, -1);
+        return jedis.lrange(DbUpdater.LINKS_DB, 0, -1);
     }
 
     @Override
     public List<String> readFromDatums(){
-        return jedis.lrange("datums", 0, -1);
+        return jedis.lrange(DbUpdater.DATUMS_DB, 0, -1);
     }
 
     @Override
     public Map<String, String> readFromVisited(){
-        return jedis.hgetAll("visited");
+        return jedis.hgetAll(DbUpdater.VISITED_DB);
     }
 
     public void delDatums(){
-        jedis.del("datums");
+        jedis.del(DbUpdater.DATUMS_DB);
     }
 
+    @Override
     public void merge(){
         logger.info("----> merge start...");
-        while (jedis.llen("links") > 0){
-            jedis.lpush("datums", jedis.lpop("links"));
+        while (jedis.llen(DbUpdater.LINKS_DB) > 0){
+            jedis.lpush(DbUpdater.DATUMS_DB, jedis.lpop(DbUpdater.LINKS_DB));
         }
 
-        System.out.println(jedis.lrange("datums", 0, -1));
+        System.out.println(jedis.lrange(DbUpdater.DATUMS_DB, 0, -1));
         if (Config.interval != Config.JUST_ONE) {
             Map<String, String> visitedMap = readFromVisited();
             Iterator<Map.Entry<String, String>> visitedIter = visitedMap.entrySet().iterator();
             while (visitedIter.hasNext()) {
                 Map.Entry<String, String> entry = visitedIter.next();
                 if (System.currentTimeMillis() - Long.valueOf(entry.getValue()) > Config.interval) {
-                    jedis.lpush("datums", entry.getKey());
-                    jedis.hdel("visited", entry.getKey());
+                    jedis.lpush(DbUpdater.DATUMS_DB, entry.getKey());
+                    jedis.hdel(DbUpdater.VISITED_DB, entry.getKey());
                 }
             }
         }

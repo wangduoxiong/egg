@@ -29,6 +29,10 @@ public class AbtractQueueSchedule implements Schedule{
     protected BlockingQueue<String> queue;
     protected DbUpdater updater;
 
+    public void init(){
+
+    }
+
     @Override
     public CrawlDatum peek() {
         return new CrawlDatum(queue.peek());
