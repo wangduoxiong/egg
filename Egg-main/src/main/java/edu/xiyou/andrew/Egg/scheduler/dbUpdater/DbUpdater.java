@@ -1,4 +1,4 @@
-package edu.xiyou.andrew.Egg.schedule.persistent;
+package edu.xiyou.andrew.Egg.scheduler.dbUpdater;
 
 /*
  * Copyright (c) 2015 Andrew-Wang.
@@ -16,32 +16,33 @@ package edu.xiyou.andrew.Egg.schedule.persistent;
  * limitations under the License.
  */
 
+
 import edu.xiyou.andrew.Egg.parser.CrawlDatum;
 
 import java.util.List;
 import java.util.Map;
 
 /**
- * Created by andrew on 15-3-28.
+ * Created by andrew on 15-6-6.
  */
 public interface DbUpdater {
-    final static String VISITED_DB = "visited";
-    final static String DATUMS_DB = "datums";
-    final static String LINKS_DB = "links";
+    final static String VISITED_DB = "visitedDB";
+    final static String DATUMS_DB = "datumsDB";
+    final static String LINKS_DB = "linksDB";
 
-    public Map<String, String> readFromVisited();
+//    public Map<String, Long> readFromVisited();
 
-    public List<String> readFromLinks();
+//    public List<String> readFromLinks();
 
     public List<String> readFromDatums();
 
-    public void write2Visted(CrawlDatum datum);
-
     public void write2Visited(Map<String, String> map);
 
-    public void write2Datums(String... urls);
+    public void write2Visited(List<CrawlDatum> datums);
 
-    public void write2Links(String... urls);
+    public void write2Links(List<String> urls);
+
+    public void write2Datums(List<String> urls);
 
     public void merge();
 }

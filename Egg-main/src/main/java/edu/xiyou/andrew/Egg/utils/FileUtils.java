@@ -1,4 +1,4 @@
-package edu.xiyou.andrew.Egg.schedule;
+package edu.xiyou.andrew.Egg.utils;
 
 /*
  * Copyright (c) 2015 Andrew-Wang.
@@ -16,22 +16,21 @@ package edu.xiyou.andrew.Egg.schedule;
  * limitations under the License.
  */
 
-import edu.xiyou.andrew.Egg.parser.CrawlDatum;
-import edu.xiyou.andrew.Egg.schedule.persistent.DbUpdater;
-
-import java.util.Comparator;
-import java.util.List;
-import java.util.concurrent.PriorityBlockingQueue;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
- * Created by andrew on 15-3-29.
+ * Created by andrew on 15-6-7.
  */
-public class PriorityQueueSchedule extends AbtractQueueSchedule{
+public class FileUtils {
+    public static void write2File(File file, byte[] content) throws IOException {
+        if (!file.getParentFile().exists()){
+            file.getParentFile().mkdirs();
+        }
 
-    public PriorityQueueSchedule(DbUpdater updater, Comparator<? extends CrawlDatum> comparator){
-        this.updater = updater;
-        List<String> urlList = updater.readFromDatums();
-        queue = new PriorityBlockingQueue<String>(urlList);
+        FileOutputStream fos = new FileOutputStream(file);
+        fos.write(content);
+        fos.close();
     }
-
 }

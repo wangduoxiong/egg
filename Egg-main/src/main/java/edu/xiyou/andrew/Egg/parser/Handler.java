@@ -1,4 +1,4 @@
-package edu.xiyou.andrew.Egg.net;
+package edu.xiyou.andrew.Egg.parser;
 
 /*
  * Copyright (c) 2015 Andrew-Wang.
@@ -16,20 +16,29 @@ package edu.xiyou.andrew.Egg.net;
  * limitations under the License.
  */
 
-import org.apache.http.Header;
-import org.apache.http.StatusLine;
-
-import java.io.InputStream;
+import java.util.List;
 
 /**
- * Created by andrew on 15-3-29.
+ * Created by andrew on 15-6-7.
  */
-public interface Response {
-    public InputStream getContent() throws Exception;
+public interface Handler {
 
-    public Header[] getAllHeads();
+    /**
+     * 当抓取成功所做操作
+     * @param response
+     */
+    public void onSuccess(Response response);
 
-    public Header[] getHeader(String name);
+    /**
+     * 抓取失败所做操作
+     * @param response
+     */
+    public void onFail(Response response);
 
-    public StatusLine getStatusLine();
+    /**
+     * 得到下一次处理的链接
+     * @param response
+     * @return
+     */
+    public List<String> handleAndGetLinks(Response response);
 }

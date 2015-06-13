@@ -1,4 +1,4 @@
-package edu.xiyou.andrew.Egg.schedule;
+package edu.xiyou.andrew.Egg.scheduler;
 
 /*
  * Copyright (c) 2015 Andrew-Wang.
@@ -16,19 +16,22 @@ package edu.xiyou.andrew.Egg.schedule;
  * limitations under the License.
  */
 
-import edu.xiyou.andrew.Egg.schedule.persistent.DbUpdater;
-
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
 
 /**
- * Created by andrew on 15-3-28.
+ * Created by andrew on 15-6-6.
  */
-public class QueueSchedule extends AbtractQueueSchedule{
+public interface Scheduler {
+    /**
+     * 获取新的任务
+     * @return
+     */
+    public String takeTasks() throws InterruptedException;
 
-    public QueueSchedule(DbUpdater updater){
-        this.updater = updater;
-        List<String> datums = updater.readFromDatums();
-        queue = new ArrayBlockingQueue<String>(datums.size(), false, datums);
-    }
+    /**
+     * 添加新加入的任务
+     * @param urls
+     */
+    public void putTasks(List<String> urls);
+
 }

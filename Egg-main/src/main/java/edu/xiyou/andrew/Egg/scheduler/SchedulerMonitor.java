@@ -1,4 +1,4 @@
-package edu.xiyou.andrew.Egg.net;
+package edu.xiyou.andrew.Egg.scheduler;
 
 /*
  * Copyright (c) 2015 Andrew-Wang.
@@ -16,23 +16,28 @@ package edu.xiyou.andrew.Egg.net;
  * limitations under the License.
  */
 
-/**
- * Created by andrew on 15-5-20.
- */
-
-
-import edu.xiyou.andrew.Egg.parser.CrawlDatum;
-import edu.xiyou.andrew.Egg.parser.Response;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 进行获取任务的接口，定义了一个获取方法，通过
- * 该方法可以得到相应的回应。回应的接口Response。
+ * Created by andrew on 15-6-7.
  */
-public interface Request {
+public abstract class SchedulerMonitor {
+    protected AtomicInteger takeTaskCount = new AtomicInteger(0);
+    protected AtomicInteger putTaskCount = new AtomicInteger(0);
+
     /**
-     * 通过种子获取内容
-     * @param datum 种子
-     * @return 回应的具体内容
+     * 获取已经虫队列中取出请求的数量
+     * @return
      */
-    Response getResponse(CrawlDatum datum) throws Exception;
+    public int getRequestedCount(){
+        return takeTaskCount.get();
+    }
+
+    /**
+     * 获取所有存取待队列中的请求数量
+     * @return
+     */
+    public int getTotalRequestCount(){
+        return putTaskCount.get();
+    }
 }

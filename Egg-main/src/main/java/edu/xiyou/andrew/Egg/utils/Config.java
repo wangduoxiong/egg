@@ -17,12 +17,22 @@ package edu.xiyou.andrew.Egg.utils;
  */
 
 /**
- * 爬虫的整体配置
- * Created by andrew on 15-3-28.
+ * 设置爬虫的全局桉树参数
+ * Created by andrew on 15-5-21.
  */
 public class Config {
 
+    public static final String USER_AGENT = "";
 
-    public final static long JUST_ONE = -1;
-    public static long interval = 1;       //  同一网页抓取间隔的时间
+    public static final int RETRY = 3;
+
+    public static final int TTIME_OUT = 5000;
+
+    public static final int INTERVAL_JUST_ONE = -1;
+    public static int interval = INTERVAL_JUST_ONE;
+
+    public static final int FETCH_COUNT = 1000 * 1000;
+    public static final double BLOOMFILTER_ERROR_RATE = 0.001;
+
+    public static int THREAD_COUNT = 16;
 }

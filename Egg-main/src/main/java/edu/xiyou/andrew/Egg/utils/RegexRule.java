@@ -21,10 +21,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * 正则工具类
- * 正正则； url 只需满足一条正则即可
- * 负正则： url 满足一条则直接返回false
- * Created by andrew on 15-3-29.
+ * Created by andrew on 15-6-7.
  */
 public class RegexRule {
     private List<String> positive;

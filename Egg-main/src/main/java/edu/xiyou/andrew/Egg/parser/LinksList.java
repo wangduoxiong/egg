@@ -24,10 +24,10 @@ import org.jsoup.select.Elements;
 import java.util.LinkedList;
 
 /**
- * 从每个网页的Document对象中筛选出所需的链接
- * Created by andrew on 15-3-29.
+ * Created by andrew on 15-6-7.
  */
-public class LinkList extends LinkedList<String>{
+public class LinksList<E> extends LinkedList<String>{
+
     public void getLinkByA(Document document, RegexRule regexRule){
         Elements elements = document.select("a[href]");
         for (Element element : elements){
@@ -77,12 +77,4 @@ public class LinkList extends LinkedList<String>{
             }
         }
     }
-
-//    public static void main(String[] args) throws IOException {
-//        Document document = Jsoup.connect("http://www.baidu.com").get();
-//        System.out.println(document);
-//        LinkList list = new LinkList();
-//        list.getLinkByA(document, "");
-//        System.out.println(list.size());
-//    }
 }

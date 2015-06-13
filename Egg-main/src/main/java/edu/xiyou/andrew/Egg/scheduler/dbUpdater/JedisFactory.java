@@ -1,4 +1,4 @@
-package edu.xiyou.andrew.Egg.schedule.persistent;
+package edu.xiyou.andrew.Egg.scheduler.dbUpdater;
 
 /*
  * Copyright (c) 2015 Andrew-Wang.
@@ -21,10 +21,11 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 /**
- * Created by andrew on 15-3-28.
+ * Created by andrew on 15-6-6.
  */
-public class RedisFactory {
-    public static JedisPool pool = new JedisPool(new JedisPoolConfig(), "127.0.0.1");
+public class JedisFactory {
+
+    private static JedisPool pool = new JedisPool(new JedisPoolConfig(), "127.0.0.1");
 
     public static Jedis getRedisInstance(){
         return pool.getResource();
@@ -38,7 +39,9 @@ public class RedisFactory {
         pool.returnResource(jedis);
     }
 
-    public static void destroy(){
-        pool.destroy();
-    }
+//    public int getNumActive(){
+//        return pool.getNumActive();
+//    }
+
 }
+

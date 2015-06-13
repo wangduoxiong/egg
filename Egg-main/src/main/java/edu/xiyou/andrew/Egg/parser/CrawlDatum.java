@@ -17,29 +17,20 @@ package edu.xiyou.andrew.Egg.parser;
  */
 
 /**
- * 爬取任务的结构体
- * Created by andrew on 15-3-28.
+ * Created by andrew on 15-5-20.
  */
-public class CrawlDatum implements Comparable<CrawlDatum> {
-    private String url;             //任务的url
-    private long fetchTime;         //任务最后的爬取时间
+public class CrawlDatum {
+    public static final long UNFETCH_TIME = 0;  //未抓取的时间值
 
-    public final static long UNFETCH_TIME = 0;
+    long fetchTime;         //  最后一次抓取的时间
+    String url;
+
+    public CrawlDatum(String url) {
+        this(url, UNFETCH_TIME);
+    }
 
     public CrawlDatum(String url, long fetchTime) {
-        this.url = url;
         this.fetchTime = fetchTime;
-    }
-
-    public CrawlDatum(String url){
-        this(url, CrawlDatum.UNFETCH_TIME);
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
         this.url = url;
     }
 
@@ -51,8 +42,11 @@ public class CrawlDatum implements Comparable<CrawlDatum> {
         this.fetchTime = fetchTime;
     }
 
-    @Override
-    public int compareTo(CrawlDatum datum) {
-        return url.compareTo(datum.url);
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }
