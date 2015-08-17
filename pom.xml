@@ -21,7 +21,6 @@
 
     <modules>
         <module>Egg-main</module>
-        <module>Egg-plugins</module>
     </modules>
 
     <dependencies>
