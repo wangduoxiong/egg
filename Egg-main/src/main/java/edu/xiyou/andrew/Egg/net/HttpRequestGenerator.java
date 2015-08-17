@@ -46,7 +46,8 @@ public class HttpRequestGenerator {
             httpClientBuilder.setUserAgent("");
         }
 
-        SocketConfig socketConfig = SocketConfig.custom().setSoKeepAlive(false).setTcpNoDelay(true).setSoTimeout(Config.TTIME_OUT).build();
+        SocketConfig socketConfig = SocketConfig.custom().setSoKeepAlive(false).
+                setTcpNoDelay(true).setSoTimeout(Config.TTIME_OUT).build();
         httpClientBuilder.setDefaultSocketConfig(socketConfig);
 
         httpClientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(Config.RETRY, true));

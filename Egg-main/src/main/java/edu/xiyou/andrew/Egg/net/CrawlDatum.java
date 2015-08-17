@@ -20,6 +20,7 @@ import org.apache.http.HttpHost;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by andrew on 15-5-20.
@@ -29,6 +30,7 @@ public class CrawlDatum implements Serializable{
 
     long fetchTime;         //  最后一次抓取的时间
     Site site;
+    String method;
 
     public CrawlDatum(Site site) {
         this(site, UNFETCH_TIME);
@@ -55,14 +57,22 @@ public class CrawlDatum implements Serializable{
         this.site = site;
     }
 
+    public String getMethod(){
+        return method;
+    }
+
+    public void setMethod(String method){
+        this.method = method;
+    }
+
     static class Site implements Comparable,Serializable{
         private String url;
         private String userAgent;
+        private Integer prority;
         private Map<String, String> cookies;
-
+        private Map<String, Object> wireSign;
         private Map<String, String> headers;
         private String host;
-
         private HttpHost httpHost;
 
         public Site(String url, String userAgent) {
@@ -75,6 +85,14 @@ public class CrawlDatum implements Serializable{
             this.cookies = cookies;
             this.headers = headers;
             this.host = host;
+        }
+
+        public void setWireSign(Map<String, Object> wireSign){
+            this.wireSign = wireSign;
+        }
+
+        public Map<String, Object> getWireSign(){
+            return wireSign;
         }
 
         public String getHost() {
@@ -123,6 +141,14 @@ public class CrawlDatum implements Serializable{
 
         public void setHttpHost(HttpHost httpHost) {
             this.httpHost = httpHost;
+        }
+
+        public void setPrority(Integer prority){
+            this.prority = prority;
+        }
+
+        public Integer getPrority(){
+            return prority;
         }
 
         @Override
