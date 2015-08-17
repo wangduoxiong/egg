@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import edu.xiyou.andrew.Egg.utils.NumberTools;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;

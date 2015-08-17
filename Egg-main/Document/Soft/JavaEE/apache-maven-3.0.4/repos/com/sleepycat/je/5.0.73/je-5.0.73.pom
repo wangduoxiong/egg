@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>je</artifactId>
+  <groupId>com.sleepycat</groupId>
+  <version>5.0.73</version>
+
+  <organization>
+    <name>Oracle Corporation</name>
+    <url>http://www.oracle.com/</url>
+  </organization>
+
+  <licenses>
+    <license>
+      <name>Sleepycat License</name>
+      <url>http://download.oracle.com/maven/com/sleepycat/je/license.txt</url>
+    </license>
+  </licenses>
+
+  <issueManagement>
+    <system>Oracle OTN Network Forum for Berkeley DB Java Edition</system>
+    <url>http://forums.oracle.com/forums/forum.jspa?forumID=273</url>
+  </issueManagement>
+
+  <mailingLists>
+    <mailingList>
+      <name>Oracle Berkeley DB Products Release Announcement List</name>
+      <subscribe>bdb-subscribe@oss.oracle.com</subscribe>
+      <unsubscribe>bdb-unsubscribe@oss.oracle.com</unsubscribe>
+    </mailingList>
+  </mailingLists>
+
+  <name>Berkeley DB Java Edition</name>
+  <description>Berkeley DB Java Edition is a open source, transactional storage solution for Java applications. The Direct Persistence Layer (DPL) API is faster and easier to develop, deploy, and manage than serialized object files or ORM-based Java persistence solutions.  The Collections API enhances the standard java.util.collections classes allowing them to be persisted to a local file system and accessed concurrently while protected by ACID transactions. Data is stored by serializing objects and managing class and instance data separately so as not to waste space. Berkeley DB Java Edition is the reliable drop-in solution for complex, fast, and scalable storage.  Source for this release is in 'je-5.0.73-sources.jar', the Javadoc is located at 'http://download.oracle.com/berkeley-db/docs/je/5.0.73/'.</description>
+  <url>http://www.oracle.com/technetwork/products/berkeleydb/overview/index.html</url>
+  
+  <scm>
+    <url>http://www.oracle.com/technetwork/products/berkeleydb/downloads/index.html</url>
+    <developerConnection>http://download.oracle.com/otn/berkeley-db/je-5.0.73.zip</developerConnection>
+  </scm>
+  
+  <developers>
+    <developer>
+      <organization>Oracle Corporation</organization>
+      <organizationUrl>http://www.oracle.com/</organizationUrl>
+    </developer>
+  </developers>
+</project>
