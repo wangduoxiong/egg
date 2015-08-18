@@ -155,6 +155,20 @@ public class CrawlDatum implements Serializable{
         public int compareTo(Object o) {
             return 0;
         }
+
+        @Override
+        public String toString() {
+            return "Site{" +
+                    "url='" + url + '\'' +
+                    ", userAgent='" + userAgent + '\'' +
+                    ", prority=" + prority +
+                    ", cookies=" + cookies +
+                    ", wireSign=" + wireSign +
+                    ", headers=" + headers +
+                    ", host='" + host + '\'' +
+                    ", httpHost=" + httpHost +
+                    '}';
+        }
     }
 
 }
