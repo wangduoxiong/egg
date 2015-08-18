@@ -19,6 +19,7 @@ package edu.xiyou.andrew.Egg.net;
 import org.apache.http.HttpHost;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Map;
 import java.util.Objects;
 
@@ -31,6 +32,10 @@ public class CrawlDatum implements Serializable{
     long fetchTime;         //  最后一次抓取的时间
     Site site;
     String method;
+
+    public CrawlDatum(String url){
+        this(new Site(url), UNFETCH_TIME);
+    }
 
     public CrawlDatum(Site site) {
         this(site, UNFETCH_TIME);
@@ -65,7 +70,7 @@ public class CrawlDatum implements Serializable{
         this.method = method;
     }
 
-    static class Site implements Comparable,Serializable{
+    public static class Site implements Comparable,Serializable{
         private String url;
         private String userAgent;
         private Integer prority;
@@ -74,6 +79,10 @@ public class CrawlDatum implements Serializable{
         private Map<String, String> headers;
         private String host;
         private HttpHost httpHost;
+
+        public Site(String url){
+            this(url, null);
+        }
 
         public Site(String url, String userAgent) {
             this(url, userAgent, null, null, null);

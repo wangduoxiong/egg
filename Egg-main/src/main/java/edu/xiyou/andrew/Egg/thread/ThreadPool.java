@@ -1,4 +1,4 @@
-package edu.xiyou.andrew.Egg.fetcher;
+package edu.xiyou.andrew.Egg.thread;
 
 /*
  * Copyright (c) 2015 Andrew-Wang.
@@ -21,6 +21,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by andrew on 15-6-7.
@@ -32,8 +35,11 @@ public class ThreadPool {
     private final int MAX_POOL_SIZE = 64;
 
     private volatile int poolSize = DEFAULT_POOL_SIZE;
-//    static protected AtomicInteger activeThread = new AtomicInteger(0);
+    private AtomicInteger activeThread = new AtomicInteger(0);
     private ExecutorService service = null;
+
+    private ReentrantLock reentrantLock = new ReentrantLock();
+    private Condition condition = reentrantLock.newCondition();
 
     public ThreadPool(int poolSize, ExecutorService service){
         if (checkPoolSize(poolSize)){
@@ -49,8 +55,37 @@ public class ThreadPool {
         service = Executors.newFixedThreadPool(this.poolSize);
     }
 
-    public synchronized void execute(Runnable runnable){
-        service.execute(runnable);
+    public synchronized void execute(final Runnable runnable){
+        if (activeThread.get() >= poolSize){
+            reentrantLock.lock();
+            try {
+                while (activeThread.get() < poolSize){
+                    condition.await();
+                }
+            } catch (InterruptedException e) {
+            }finally {
+                reentrantLock.unlock();
+            }
+        }
+        activeThread.getAndDecrement();
+        service.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    runnable.run();
+                }finally {
+                    reentrantLock.lock();
+                    try {
+                        activeThread.decrementAndGet();
+                        condition.signalAll();
+                    }finally {
+                        reentrantLock.unlock();
+                    }
+
+                }
+            }
+        });
+
     }
 
     private boolean checkPoolSize(int poolSize){
@@ -67,7 +102,13 @@ public class ThreadPool {
     public void close(){
         service.shutdown();
     }
-//    static class Task implements Runnable{
+
+    public AtomicInteger getActiveThread() {
+        return activeThread;
+    }
+
+
+    //    static class Task implements Runnable{
 //
 //        @Override
 //        public void run() {

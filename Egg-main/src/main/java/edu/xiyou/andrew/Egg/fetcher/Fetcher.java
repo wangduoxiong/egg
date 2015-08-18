@@ -18,14 +18,22 @@ package edu.xiyou.andrew.Egg.fetcher;
 
 
 import edu.xiyou.andrew.Egg.net.CrawlDatum;
-import edu.xiyou.andrew.Egg.parser.*;
+import edu.xiyou.andrew.Egg.net.HttpRequest;
+import edu.xiyou.andrew.Egg.net.Request;
+import edu.xiyou.andrew.Egg.parser.Handler;
+import edu.xiyou.andrew.Egg.parser.Html;
+import edu.xiyou.andrew.Egg.parser.LinksList;
+import edu.xiyou.andrew.Egg.parser.Response;
 import edu.xiyou.andrew.Egg.scheduler.BloomDepthScheduler;
 import edu.xiyou.andrew.Egg.scheduler.BloomScheduler;
 import edu.xiyou.andrew.Egg.scheduler.Scheduler;
+import edu.xiyou.andrew.Egg.thread.ThreadPool;
 import edu.xiyou.andrew.Egg.utils.Config;
 import edu.xiyou.andrew.Egg.utils.FileUtils;
 import edu.xiyou.andrew.Egg.utils.RegexRule;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
+import org.apache.http.conn.ConnectionPoolTimeoutException;
 import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +42,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -44,23 +53,33 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Fetcher {
     private static Logger logger = LoggerFactory.getLogger(Fetcher.class);
 
-    private static int RUNNING = 0;
-    private static int STOP = 1;
-    private static String CURRENT_THREAD_NAME = Thread.currentThread().getName();
-    private static String FETCH_OUTPUT_STRING = CURRENT_THREAD_NAME + " fetch: ";
+    protected static final int RUNNING = 0;
+    protected static final int STOP = 1;
+    protected static final int EXIT = 2;
+    protected static final String CURRENT_THREAD_NAME = Thread.currentThread().getName();
+    protected static final String FETCH_OUTPUT_STRING = CURRENT_THREAD_NAME + " fetch: ";
 
     protected Scheduler scheduler;
-    private ThreadPool threadPool = new ThreadPool(Config.THREAD_COUNT);
+    protected ThreadPool threadPool = new ThreadPool(Config.THREAD_COUNT);
     protected Handler handler;
     protected int depth;
+    protected Request request;
+    protected volatile int poolSize = Config.THREAD_COUNT;
+    protected int ThreadCount = Config.THREAD_COUNT;
+    protected ReentrantLock reentrantLock = new ReentrantLock();
+    protected Condition newUrlCondition = reentrantLock.newCondition();
+    protected Condition activeThreadCondition = reentrantLock.newCondition();
 
-    private final AtomicInteger activeThread = new AtomicInteger(0);
-    private AtomicInteger waitThread = new AtomicInteger(0);
-    private AtomicInteger fetchCount = new AtomicInteger(0);
+    protected AtomicInteger activeThread ;
+    protected AtomicInteger fetchCount;
 
+    protected volatile long emptySleepTime = Config.emptySleepTime;
+    protected volatile int runStatus = RUNNING;
 
-    private volatile int runState = RUNNING;
-
+    public Fetcher(Scheduler scheduler, Handler handler) {
+        this.scheduler = scheduler;
+        this.handler = handler;
+    }
 
     public Fetcher(Scheduler scheduler, Handler handler, int depth){
         this.handler = handler;
@@ -68,80 +87,68 @@ public class Fetcher {
         this.depth = depth;
     }
 
-    class FetcherThread implements Runnable{
+    class FecherThread extends FetcherMonitor implements Runnable{
+        private Request request;
+        private long sleepTime = 5000;
+        private ReentrantLock reentrantLock = new ReentrantLock();
+        private String url;
 
-//        private Scheduler scheduler;
-        private AtomicInteger fetchCount;
-        private HttpRequest request = new HttpRequest();
-        private Html html;
-        private ReentrantLock threadLock = new ReentrantLock();
-        private Condition product = threadLock.newCondition();
-        private Condition consume = threadLock.newCondition();
-
-        public FetcherThread(AtomicInteger fetchCount){
-            this.fetchCount = fetchCount;
+        public FecherThread(String url, Request request) {
+            this.url = url;
+            this.request = request;
         }
-
-        int runState = RUNNING;
-
-//        private String getTask(){
-//            String url = null;
-//            threadLock.lock();
-//            try {
-//                while ((url = scheduler.takeTasks()) == null){
-//                    Thread.sleep(500);
-//                }
-//            } catch (InterruptedException e) {
-//                logger.error(e.getMessage());
-//            }finally{
-//                thread.unlock;
-//            }
-//            return null;
-//        }
 
         @Override
         public void run() {
-
-            logger.info(CURRENT_THREAD_NAME + " is running \n");
-
             try {
-                activeThread.incrementAndGet();
-                while ((runState == RUNNING) && (fetchCount.get() < Config.FETCH_COUNT)) {
-                    String url = null;
-                    url = scheduler.takeTasks();
-                    if (url != null) {
+                if (runStatus != EXIT) {
+                    if (runStatus == STOP) {
+                        stop();
+                        Thread.sleep(5);
+                    }
+                    Html html;
+                    if (runStatus == RUNNING) {
+                        if (runStatus == RUNNING && StringUtils.isNotBlank(url)){
+                            CrawlDatum datum = getCrawDatum(url);
+                            html = (Html) request.getResponse(datum);
+                            datum.setFetchTime(System.currentTimeMillis());
 
-                        logger.info(FETCH_OUTPUT_STRING + url);
-                        CrawlDatum datum = new CrawlDatum(url);
-                        html = (Html) request.getResponse(datum);
-                        datum.setFetchTime(System.currentTimeMillis());
-                        if (html == null){
-                            continue;
+                            if ((html == null) || (html.getStatusLine() == null) || html.getStatusLine().getStatusCode() != HttpStatus.SC_OK){
+                                handler.onFail(html);
+                                logger.info(FETCH_OUTPUT_STRING + " fetched error");
+                            }else {
+                                handler.onSuccess(html);
+                                List<String> urlList = handler.handleAndGetLinks(html);
+                                addSeed(urlList);
+//                                logger.info(FETCH_OUTPUT_STRING + "fetched sucess");
+                            }
                         }
-
-                        int status = html.getStatusLine().getStatusCode();
-                        if (status != HttpStatus.SC_OK) {
-                            handler.onFail(html);
-                            logger.info(FETCH_OUTPUT_STRING + url + " fail", "StatusCode: " + status);
-                            continue;
-                        }
-
-                        handler.onSuccess(html);
-                        List<String> urlList = handler.handleAndGetLinks(html);
-//                        System.out.println(urlList.size());
-                        scheduler.putTasks(urlList);
-                        fetchCount.incrementAndGet();
                     }
                 }
             } catch (InterruptedException e) {
-                logger.error(e.getMessage());
-            } finally {
-                activeThread.decrementAndGet();
+                logger.error(Thread.currentThread().getName() + " InterruptedException: " +  e);
+            } catch (Exception e) {
+                logger.error(Thread.currentThread().getName() + " Exception: " + e);
             }
         }
 
-        public void stop(){
-            runState = STOP;
+        private void stop(){
+            reentrantLock.lock();
+            try {
+                while (runStatus == STOP){
+                    Thread.sleep(sleepTime);
+                }
+            } catch (InterruptedException e) {
+                logger.error("op=stop " + e);
+            }finally {
+                reentrantLock.unlock();
+            }
+        }
+
+        private CrawlDatum getCrawDatum(String url){
+            CrawlDatum datum = new CrawlDatum(url);
+            datum.getSite().setUserAgent(Config.USER_AGENT);
+            return datum;
         }
     }
 
@@ -157,44 +164,85 @@ public class Fetcher {
 
     public void fetch(){
         before();
-        FetcherThread[] threads = new FetcherThread[Config.THREAD_COUNT];
+        init();
 
-        for (int i =0; i < Config.THREAD_COUNT; i++){
-            threads[i] = new FetcherThread(fetchCount);
-            threadPool.execute(threads[i]);
-        }
-
-        if (runState == STOP){
-            for (int i = 0; i < Config.THREAD_COUNT; i++){
-                threads[i].stop();
-            }
-        }
-
-        if (activeThread.get() > 0){
+        while (!Thread.currentThread().isInterrupted() && (runStatus == RUNNING)) {
+            reentrantLock.lock();
             try {
-                Thread.sleep(20 * 60 * 1000);
+                while (threadPool.getActiveThread().get() >= poolSize){
+                    activeThreadCondition.await();
+                }
             } catch (InterruptedException e) {
-                logger.error(e.getMessage());
             }
+            finally {
+                reentrantLock.unlock();
+            }
+            try {
+                String url;
+                while ((url = scheduler.poll()) == null) {
+                    waitNewUrl();
+                }
+                threadPool.execute(new FecherThread(url, request));
+
+            } catch (InterruptedException e) {
+                logger.error("op=fetch exception: " + e);
+            }
+            reentrantLock.lock();
+            try {
+                activeThreadCondition.signalAll();
+            }finally {
+                reentrantLock.unlock();
+            }
+        }
+    }
+
+    private void waitNewUrl() {
+        reentrantLock.lock();
+        try {
+            if (runStatus == EXIT){
+                return;
+            }
+            newUrlCondition.await(emptySleepTime, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            logger.error("op=waitNewUrl exception: " + e);
+        }finally {
+            reentrantLock.unlock();
         }
     }
 
     public void stop(){
-        runState = STOP;
+        runStatus = STOP;
+    }
+
+    public void init(){
+        activeThread = new AtomicInteger(0);
+        fetchCount = new AtomicInteger(0);
+        request = new HttpRequest().setPoolSize(poolSize);
+    }
+
+    public void addSeed(List<String> urlList){
+        if (scheduler == null){
+            scheduler = new BloomDepthScheduler();
+        }
+        scheduler.offer(urlList);
+
+        reentrantLock.lock();
+        try {
+            newUrlCondition.signalAll();
+        }finally {
+            reentrantLock.unlock();
+        }
     }
 
     public static void main(String[] args) {
         Scheduler scheduler1 = new BloomScheduler();
-        scheduler1.putTasks(Arrays.asList("http://www.importnew.com/all-posts", "http://blog.csdn.net/"));
         Fetcher fetcher = new Fetcher(scheduler1, new Handler() {
             @Override
             public void onSuccess(Response response) {
-//                System.out.println(((Html) response).getUrl() + response.getStatusLine());
-//                System.out.println(new String(((Html)response).getContent()));
-                String path = "/home/andrew/Data/";
+                String path = "/home/duoxiongwang/Documents/project/data/";
                 String fileName = path + System.currentTimeMillis();
                 try {
-                    FileUtils.write2File(new File(fileName), ((Html) response).getContent());
+                    FileUtils.write2File(new File(fileName), response.getContent());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -213,15 +261,88 @@ public class Fetcher {
                         "http://www.importnew.com/\\d+.html",
                         "http://blog.csdn.net/?&page=\\d+"));
                 list.getLinkByA(Jsoup.parse(new String(response.getContent())), regexRule);
+
+                logger.info("\n\n\n" + list + "\n\n\n");
                 return list;
             }
         }, 0);
+        fetcher.init();
+        fetcher.before();
+        fetcher.setScheduler(scheduler1);
+        scheduler1.offer(Arrays.asList("http://www.importnew.com/all-posts", "http://blog.csdn.net"));
 
-//        try {
-//            System.out.println(scheduler1.takeTasks());
-//        } catch (InterruptedException e) {
-//            logger.error(e.getMessage() + "bbbbbbbbbbbbbb");
-//        }
         fetcher.fetch();
+    }
+
+    public Scheduler getScheduler() {
+        return scheduler;
+    }
+
+    public void setScheduler(Scheduler scheduler) {
+        this.scheduler = scheduler;
+    }
+
+    public ThreadPool getThreadPool() {
+        return threadPool;
+    }
+
+    public void setThreadPool(ThreadPool threadPool) {
+        this.threadPool = threadPool;
+    }
+
+    public Handler getHandler() {
+        return handler;
+    }
+
+    public void setHandler(Handler handler) {
+        this.handler = handler;
+    }
+
+    public int getDepth() {
+        return depth;
+    }
+
+    public void setDepth(int depth) {
+        this.depth = depth;
+    }
+
+    public Request getRequest() {
+        return request;
+    }
+
+    public void setRequest(Request request) {
+        this.request = request;
+    }
+
+    public int getThreadCount() {
+        return ThreadCount;
+    }
+
+    public void setThreadCount(int threadCount) {
+        ThreadCount = threadCount;
+    }
+
+    public int getRunStatus() {
+        return runStatus;
+    }
+
+    public void setRunStatus(int runStatus) {
+        this.runStatus = runStatus;
+    }
+
+    public AtomicInteger getActiveThread() {
+        return activeThread;
+    }
+
+    public AtomicInteger getFetchCount() {
+        return fetchCount;
+    }
+
+    public int getPoolSize() {
+        return poolSize;
+    }
+
+    public void setPoolSize(int poolSize) {
+        this.poolSize = poolSize;
     }
 }

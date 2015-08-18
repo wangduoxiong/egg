@@ -22,7 +22,7 @@ package edu.xiyou.andrew.Egg.utils;
  */
 public class Config {
 
-    public static final String USER_AGENT = "";
+    public static final String USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/43.0.2357.130 Chrome/43.0.2357.130 Safari/537.36";
 
     public static final int RETRY = 3;
 
@@ -35,4 +35,6 @@ public class Config {
     public static final double BLOOMFILTER_ERROR_RATE = 0.001;
 
     public static int THREAD_COUNT = 16;
+
+    public static long emptySleepTime = 3000;
 }

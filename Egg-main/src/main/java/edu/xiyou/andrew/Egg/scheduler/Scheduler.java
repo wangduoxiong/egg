@@ -26,12 +26,12 @@ public interface Scheduler {
      * 获取新的任务
      * @return
      */
-    public String takeTasks() throws InterruptedException;
+    public String poll() throws InterruptedException;
 
     /**
      * 添加新加入的任务
      * @param urls
      */
-    public void putTasks(List<String> urls);
+    public void offer(List<String> urls);
 
 }

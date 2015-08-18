@@ -30,13 +30,14 @@ import java.util.concurrent.LinkedBlockingQueue;
  * Created by andrew on 15-6-7.
  */
 public class BloomDepthScheduler extends SchedulerMonitor implements Scheduler{
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     private BloomFilter<String> bloomFilter = new BloomFilter<String>(Config.BLOOMFILTER_ERROR_RATE, Config.FETCH_COUNT);
     private BlockingQueue<String> currentQueue = new LinkedBlockingQueue<String>();
     private BlockingQueue<String> nextQueue = new LinkedBlockingQueue<String>();
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
-    public String takeTasks() {
+    public String poll() {
         takeTaskCount.incrementAndGet();
         try {
             return currentQueue.take();
@@ -47,7 +48,7 @@ public class BloomDepthScheduler extends SchedulerMonitor implements Scheduler{
     }
 
     @Override
-    public void putTasks(List<String> urls) {
+    public void offer(List<String> urls) {
         synchronized (this) {
             for (String url : urls) {
                 if ((url != null) && !bloomFilter.contains(url)) {

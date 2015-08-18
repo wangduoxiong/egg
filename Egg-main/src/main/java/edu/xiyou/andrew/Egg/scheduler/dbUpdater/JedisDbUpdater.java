@@ -58,7 +58,7 @@ public class JedisDbUpdater implements DbUpdater{
     public void write2Visited(List<CrawlDatum> datums) {
         Map<String, String> map = new HashMap<String, String>((int)(datums.size() / 0.75));
         for (CrawlDatum datum : datums){
-            map.put(datum.getUrl(), "" + datum.getFetchTime());
+            map.put(datum.getSite().getUrl(), "" + datum.getFetchTime());
         }
         jedis.hmset(DbUpdater.VISITED_DB, map);
     }
@@ -87,11 +87,9 @@ public class JedisDbUpdater implements DbUpdater{
         if (Config.interval != Config.INTERVAL_JUST_ONE){
             logger.info("----> start merge visitedDB and datumsDB <----");
             Map<String, String> map = jedis.hgetAll(DbUpdater.VISITED_DB);
-            Iterator<Map.Entry<String, String>> iterator = map.entrySet().iterator();
-            while (iterator.hasNext()){
-                Map.Entry<String, String> entry = iterator.next();
+            for (Map.Entry<String, String> entry : map.entrySet()) {
                 long lastFetchTime = Long.valueOf(entry.getValue());
-                if ((System.currentTimeMillis() - lastFetchTime) > Config.interval){
+                if ((System.currentTimeMillis() - lastFetchTime) > Config.interval) {
                     jedis.hdel(DbUpdater.VISITED_DB, entry.getKey());
                     jedis.lpush(DbUpdater.DATUMS_DB, entry.getKey());
                 }

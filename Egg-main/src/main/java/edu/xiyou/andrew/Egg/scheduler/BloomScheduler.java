@@ -32,27 +32,28 @@ import java.util.concurrent.TimeUnit;
  */
 @ThreadSafe
 public class BloomScheduler extends SchedulerMonitor implements Scheduler {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     private BlockingQueue<String> queue = new LinkedBlockingQueue<String>();
     private BloomFilter<String> bloomFilter = new BloomFilter<String>(Config.BLOOMFILTER_ERROR_RATE, Config.FETCH_COUNT);
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
-
     @Override
-    public String takeTasks() throws InterruptedException {
+    public String poll() throws InterruptedException {
         takeTaskCount.incrementAndGet();
-        String url = queue.poll(60, TimeUnit.SECONDS);
+        String url = queue.poll(3000, TimeUnit.MILLISECONDS);
+        logger.info("poll url: " + url);
         return url;
     }
 
     @Override
-    public void putTasks(List<String> urls) {
+    public void offer(List<String> urls) {
         synchronized (this) {
             for (String url : urls) {
                 if ((url != null) && !bloomFilter.contains(url)) {
-//                    System.out.println(url);
                     putTaskCount.incrementAndGet();
                     bloomFilter.add(url);
                     queue.offer(url);
+                    logger.info("offer url: " + url);
                 }
             }
         }

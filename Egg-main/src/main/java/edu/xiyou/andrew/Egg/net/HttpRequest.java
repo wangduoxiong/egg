@@ -43,8 +43,9 @@ public class HttpRequest implements Request{
         return httpRequestGenerator.generateClient(site);
     }
 
-    public void setMaxTotal(int maxTotal){
-        httpRequestGenerator.setMaxTotal(maxTotal);
+    public HttpRequest setPoolSize(int poolSize){
+        httpRequestGenerator.setMaxTotal(poolSize);
+        return this;
     }
 
     private boolean siteIsBlank(CrawlDatum.Site site){
@@ -65,16 +66,16 @@ public class HttpRequest implements Request{
         HttpUriRequest httpUriRequest = getHttpUriRequest(datum, new HashMap<String, String>());
         HttpResponse response = httpClient.execute(httpUriRequest);
 
-
-        return handlerResponse(response);
+        return handlerResponse(datum, response);
     }
 
-    private Response handlerResponse(HttpResponse response) {
+    private Response handlerResponse(CrawlDatum datum,HttpResponse response) {
         Html html = new Html();
         if (response == null){
             return html;
         }
         try {
+            html.setUrl(datum.getSite().getUrl());
             html.setContent(IOUtils.toByteArray(response.getEntity().getContent()));
             html.setHeaders(response.getAllHeaders());
             html.setProtocolVersion(response.getProtocolVersion());
@@ -87,7 +88,7 @@ public class HttpRequest implements Request{
     }
 
     private HttpUriRequest getHttpUriRequest(CrawlDatum datum, Map<String, String> headers){
-        RequestBuilder requestBuilder = selectRequestMethod(datum);
+        RequestBuilder requestBuilder = selectRequestMethod(datum).setUri(datum.getSite().getUrl());
         if (MapUtils.isEmpty(headers)){
             datum.site.setHeaders(headers);
         }
