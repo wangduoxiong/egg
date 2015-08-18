@@ -17,7 +17,7 @@ package edu.xiyou.andrew.Egg.fetcher;
  */
 
 
-import edu.xiyou.andrew.Egg.net.HttpRequest;
+import edu.xiyou.andrew.Egg.net.CrawlDatum;
 import edu.xiyou.andrew.Egg.parser.*;
 import edu.xiyou.andrew.Egg.scheduler.BloomDepthScheduler;
 import edu.xiyou.andrew.Egg.scheduler.BloomScheduler;

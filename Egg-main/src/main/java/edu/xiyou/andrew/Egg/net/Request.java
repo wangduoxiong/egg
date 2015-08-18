@@ -21,7 +21,6 @@ package edu.xiyou.andrew.Egg.net;
  */
 
 
-import edu.xiyou.andrew.Egg.parser.CrawlDatum;
 import edu.xiyou.andrew.Egg.parser.Response;
 
 /**

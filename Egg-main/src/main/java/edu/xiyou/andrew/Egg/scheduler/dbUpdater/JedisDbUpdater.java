@@ -17,7 +17,7 @@ package edu.xiyou.andrew.Egg.scheduler.dbUpdater;
  */
 
 
-import edu.xiyou.andrew.Egg.parser.CrawlDatum;
+import edu.xiyou.andrew.Egg.net.CrawlDatum;
 import edu.xiyou.andrew.Egg.utils.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
