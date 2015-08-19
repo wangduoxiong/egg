@@ -109,6 +109,7 @@ public class Fetcher {
                     Html html;
                     if (runStatus == RUNNING) {
                         if (runStatus == RUNNING && StringUtils.isNotBlank(url)){
+                            logger.info("start " + FETCH_OUTPUT_STRING + url);
                             CrawlDatum datum = getCrawDatum(url);
                             html = (Html) request.getResponse(datum);
                             datum.setFetchTime(System.currentTimeMillis());
@@ -120,7 +121,7 @@ public class Fetcher {
                                 handler.onSuccess(html);
                                 List<String> urlList = handler.handleAndGetLinks(html);
                                 addSeed(urlList);
-//                                logger.info(FETCH_OUTPUT_STRING + "fetched sucess");
+                                logger.info(FETCH_OUTPUT_STRING + "fetched sucess");
                             }
                         }
                     }
@@ -167,33 +168,48 @@ public class Fetcher {
         init();
 
         while (!Thread.currentThread().isInterrupted() && (runStatus == RUNNING)) {
-            reentrantLock.lock();
-            try {
-                while (threadPool.getActiveThread().get() >= poolSize){
-                    activeThreadCondition.await();
-                }
-            } catch (InterruptedException e) {
-            }
-            finally {
-                reentrantLock.unlock();
-            }
             try {
                 String url;
                 while ((url = scheduler.poll()) == null) {
                     waitNewUrl();
                 }
-                threadPool.execute(new FecherThread(url, request));
+                String finalUrl = url;
+                execute(new FecherThread(finalUrl, request));
 
             } catch (InterruptedException e) {
                 logger.error("op=fetch exception: " + e);
             }
-            reentrantLock.lock();
-            try {
-                activeThreadCondition.signalAll();
-            }finally {
-                reentrantLock.unlock();
-            }
         }
+    }
+
+    private void execute(final Runnable runnable){
+        reentrantLock.lock();
+        try {
+            while (threadPool.getActiveThread().get() >= poolSize){
+                activeThreadCondition.await();
+            }
+        } catch (InterruptedException e) {
+            logger.error(Thread.currentThread().getName() +" run error: " + e);
+        }finally {
+            reentrantLock.unlock();
+        }
+        threadPool.getActiveThread().incrementAndGet();
+        threadPool.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    runnable.run();
+                }finally {
+                    reentrantLock.lock();
+                    try {
+                        activeThreadCondition.signalAll();
+                        threadPool.getActiveThread().decrementAndGet();
+                    }finally {
+                        reentrantLock.unlock();
+                    }
+                }
+            }
+        });
     }
 
     private void waitNewUrl() {
@@ -234,45 +250,7 @@ public class Fetcher {
         }
     }
 
-    public static void main(String[] args) {
-        Scheduler scheduler1 = new BloomScheduler();
-        Fetcher fetcher = new Fetcher(scheduler1, new Handler() {
-            @Override
-            public void onSuccess(Response response) {
-                String path = "/home/duoxiongwang/Documents/project/data/";
-                String fileName = path + System.currentTimeMillis();
-                try {
-                    FileUtils.write2File(new File(fileName), response.getContent());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
 
-            @Override
-            public void onFail(Response response) {
-
-            }
-
-            @Override
-            public List<String> handleAndGetLinks(Response response) {
-                LinksList list = new LinksList();
-                RegexRule regexRule = new RegexRule();
-                regexRule.addPositive(Arrays.asList("http://blog.csdn.net/\\w+/article/details/\\d+",
-                        "http://www.importnew.com/\\d+.html",
-                        "http://blog.csdn.net/?&page=\\d+"));
-                list.getLinkByA(Jsoup.parse(new String(response.getContent())), regexRule);
-
-                logger.info("\n\n\n" + list + "\n\n\n");
-                return list;
-            }
-        }, 0);
-        fetcher.init();
-        fetcher.before();
-        fetcher.setScheduler(scheduler1);
-        scheduler1.offer(Arrays.asList("http://www.importnew.com/all-posts", "http://blog.csdn.net"));
-
-        fetcher.fetch();
-    }
 
     public Scheduler getScheduler() {
         return scheduler;

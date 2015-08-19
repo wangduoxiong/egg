@@ -55,37 +55,39 @@ public class ThreadPool {
         service = Executors.newFixedThreadPool(this.poolSize);
     }
 
-    public synchronized void execute(final Runnable runnable){
-        if (activeThread.get() >= poolSize){
-            reentrantLock.lock();
-            try {
-                while (activeThread.get() < poolSize){
-                    condition.await();
-                }
-            } catch (InterruptedException e) {
-            }finally {
-                reentrantLock.unlock();
-            }
-        }
-        activeThread.getAndDecrement();
-        service.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    runnable.run();
-                }finally {
-                    reentrantLock.lock();
-                    try {
-                        activeThread.decrementAndGet();
-                        condition.signalAll();
-                    }finally {
-                        reentrantLock.unlock();
-                    }
-
-                }
-            }
-        });
-
+//    public synchronized void execute(final Runnable runnable){
+//        if (activeThread.get() >= poolSize){
+//            reentrantLock.lock();
+//            try {
+//                while (activeThread.get() < poolSize){
+//                    condition.await();
+//                }
+//            } catch (InterruptedException e) {
+//            }finally {
+//                reentrantLock.unlock();
+//            }
+//        }
+//        activeThread.getAndDecrement();
+//        service.execute(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    runnable.run();
+//                }finally {
+//                    reentrantLock.lock();
+//                    try {
+//                        activeThread.decrementAndGet();
+//                        condition.signalAll();
+//                    }finally {
+//                        reentrantLock.unlock();
+//                    }
+//
+//                }
+//            }
+//        });
+//    }
+    public void execute(Runnable runnable){
+        service.execute(runnable);
     }
 
     private boolean checkPoolSize(int poolSize){

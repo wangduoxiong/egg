@@ -14,6 +14,7 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +66,6 @@ public class HttpRequest implements Request{
         CloseableHttpClient httpClient = httpRequestGenerator.generateClient(site);
         HttpUriRequest httpUriRequest = getHttpUriRequest(datum, new HashMap<String, String>());
         HttpResponse response = httpClient.execute(httpUriRequest);
-
         return handlerResponse(datum, response);
     }
 
@@ -83,6 +83,14 @@ public class HttpRequest implements Request{
         } catch (IOException e) {
             html.setContent("".getBytes());
             logger.error("response to html getContent error" + e);
+        }finally {
+            if (response != null){
+                try {
+                    EntityUtils.consume(response.getEntity());
+                } catch (IOException e) {
+                    logger.error("op=handlerResponse Exception: " + e);
+                }
+            }
         }
         return html;
     }
