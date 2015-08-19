@@ -28,6 +28,7 @@ import edu.xiyou.andrew.Egg.parser.Response;
  * 该方法可以得到相应的回应。回应的接口Response。
  */
 public interface Request {
+
     /**
      * 通过种子获取内容
      * @param datum 种子
