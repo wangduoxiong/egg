@@ -21,6 +21,7 @@
 
     <modules>
         <module>Egg-main</module>
+        <module>Egg-Paster</module>
     </modules>
 
     <dependencies>
