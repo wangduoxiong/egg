@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 /**
  * 可以自动匹配出正文字段和标题
  * range 是一个阙值，假如匹配到的正文段没有完整匹配到，则可以调大， 假如噪点（非正文）太多，可以调小
+ * 具体算法思想：http://wenku.baidu.com/link?url=U5r19bXhfM65kwWYXMmxcyTe8z_70IiCW7E9Pr9IxiMXVCYBhqxjjXSie7ehbnRIga20jAHBTOjcSXsZc_YeR-mqTtD7vDD_ID_jLx3KdNO
  * Created by duoxiongwang on 15-8-21.
  */
 public class MainContentFilter {

@@ -11,5 +11,12 @@
 
     <artifactId>Egg-Paster</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.ximpleware</groupId>
+            <artifactId>vtd-xml</artifactId>
+            <version>2.11</version>
+        </dependency>
 
+    </dependencies>
 </project>
