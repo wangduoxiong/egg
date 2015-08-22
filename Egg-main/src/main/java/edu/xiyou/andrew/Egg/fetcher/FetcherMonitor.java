@@ -1,18 +1,20 @@
 package edu.xiyou.andrew.Egg.fetcher;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by duoxiongwang on 15-8-18.
  */
 public abstract class FetcherMonitor {
-    protected AtomicInteger fetchCounted = new AtomicInteger(0);
+    protected AtomicLong fetchCounted ;
 
-    public AtomicInteger getFetchCounted() {
+    public FetcherMonitor(){
+        fetchCounted = new AtomicLong(0);
+    }
+
+    public AtomicLong getFetchCounted() {
         return fetchCounted;
     }
 
-    public void setFetchCounted(AtomicInteger fetchCounted) {
-        this.fetchCounted = fetchCounted;
-    }
 }

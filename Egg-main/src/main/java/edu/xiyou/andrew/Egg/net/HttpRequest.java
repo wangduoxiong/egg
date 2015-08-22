@@ -34,7 +34,7 @@ public class HttpRequest implements Request{
         httpRequestGenerator = new HttpRequestGenerator();
     }
 
-    private CloseableHttpClient generateRequest(CrawlDatum.Site site){
+    private synchronized CloseableHttpClient generateRequest(CrawlDatum.Site site){
         logger.info("generatorClient start....");
         if ((site == null) || (StringUtils.isBlank(site.getUrl()))){
             logger.info("site is not conformance to requirements");
@@ -53,17 +53,13 @@ public class HttpRequest implements Request{
         return (site == null) || StringUtils.isBlank(site.getUrl());
     }
 
-    private boolean siteIsNotBlank(CrawlDatum.Site site){
-        return !siteIsBlank(site);
-    }
-
     @Override
     public Response getResponse(CrawlDatum datum) throws Exception {
         if ((datum == null) || siteIsBlank(datum.getSite())){
             return null;
         }
         CrawlDatum.Site site = datum.getSite();
-        CloseableHttpClient httpClient = httpRequestGenerator.generateClient(site);
+        CloseableHttpClient httpClient = generateRequest(site);
         HttpUriRequest httpUriRequest = getHttpUriRequest(datum, new HashMap<String, String>());
         HttpResponse response = httpClient.execute(httpUriRequest);
         return handlerResponse(datum, response);
@@ -82,14 +78,12 @@ public class HttpRequest implements Request{
             html.setStatusLine(response.getStatusLine());
         } catch (IOException e) {
             html.setContent("".getBytes());
-            logger.error("response to html getContent error" + e);
+            logger.error("response to html getContent error" + e + "\n url: " + datum.getSite().getUrl());
         }finally {
-            if (response != null){
-                try {
-                    EntityUtils.consume(response.getEntity());
-                } catch (IOException e) {
-                    logger.error("op=handlerResponse Exception: " + e);
-                }
+            try {
+                EntityUtils.consume(response.getEntity());
+            } catch (IOException e) {
+                logger.error("op=handlerResponse Exception: " + e + "\n url: " + datum.getSite().getUrl());
             }
         }
         return html;

@@ -22,35 +22,27 @@ import edu.xiyou.andrew.Egg.net.HttpRequest;
 import edu.xiyou.andrew.Egg.net.Request;
 import edu.xiyou.andrew.Egg.parser.Handler;
 import edu.xiyou.andrew.Egg.parser.Html;
-import edu.xiyou.andrew.Egg.parser.LinksList;
-import edu.xiyou.andrew.Egg.parser.Response;
 import edu.xiyou.andrew.Egg.scheduler.BloomDepthScheduler;
-import edu.xiyou.andrew.Egg.scheduler.BloomScheduler;
 import edu.xiyou.andrew.Egg.scheduler.Scheduler;
 import edu.xiyou.andrew.Egg.thread.ThreadPool;
 import edu.xiyou.andrew.Egg.utils.Config;
-import edu.xiyou.andrew.Egg.utils.FileUtils;
-import edu.xiyou.andrew.Egg.utils.RegexRule;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
-import org.apache.http.conn.ConnectionPoolTimeoutException;
-import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by andrew on 15-6-7.
  */
-public class Fetcher {
+public class Fetcher extends FetcherMonitor{
     private static Logger logger = LoggerFactory.getLogger(Fetcher.class);
 
     protected static final int RUNNING = 0;
@@ -71,23 +63,24 @@ public class Fetcher {
     protected Condition activeThreadCondition = reentrantLock.newCondition();
 
     protected AtomicInteger activeThread ;
-    protected AtomicInteger fetchCount;
 
     protected volatile long emptySleepTime = Config.emptySleepTime;
     protected volatile int runStatus = RUNNING;
 
     public Fetcher(Scheduler scheduler, Handler handler) {
+        super();
         this.scheduler = scheduler;
         this.handler = handler;
     }
 
     public Fetcher(Scheduler scheduler, Handler handler, int depth){
+        super();
         this.handler = handler;
         this.scheduler = scheduler;
         this.depth = depth;
     }
 
-    class FecherThread extends FetcherMonitor implements Runnable{
+    class FecherThread implements Runnable{
         private Request request;
         private long sleepTime = 5000;
         private ReentrantLock reentrantLock = new ReentrantLock();
@@ -101,24 +94,26 @@ public class Fetcher {
         @Override
         public void run() {
             try {
-                if (runStatus != EXIT) {
+                if ((runStatus != EXIT) || (((ThreadPoolExecutor)threadPool.getService()).getQueue().size() != 0)) {
                     if (runStatus == STOP) {
                         stop();
                         Thread.sleep(5);
                     }
                     Html html;
-                    if (runStatus == RUNNING) {
-                        if (runStatus == RUNNING && StringUtils.isNotBlank(url)){
-                            logger.info("start " + FETCH_OUTPUT_STRING + url);
-                            CrawlDatum datum = getCrawDatum(url);
-                            html = (Html) request.getResponse(datum);
-                            datum.setFetchTime(System.currentTimeMillis());
+                    if (runStatus == RUNNING && StringUtils.isNotBlank(url)){
+                        logger.info("start " + FETCH_OUTPUT_STRING + url);
+                        CrawlDatum datum = getCrawDatum(url);
+                        html = (Html) request.getResponse(datum);
+                        datum.setFetchTime(System.currentTimeMillis());
 
+                        synchronized (handler) {
                             if ((html == null) || (html.getStatusLine() == null) || html.getStatusLine().getStatusCode() != HttpStatus.SC_OK){
                                 handler.onFail(html);
                                 logger.info(FETCH_OUTPUT_STRING + " fetched error");
                             }else {
                                 handler.onSuccess(html);
+                                fetchCounted.incrementAndGet();
+                                System.out.printf("\nfetchCounted:" + fetchCounted.get() + "\n");
                                 List<String> urlList = handler.handleAndGetLinks(html);
                                 addSeed(urlList);
                                 logger.info(FETCH_OUTPUT_STRING + "fetched sucess");
@@ -127,9 +122,10 @@ public class Fetcher {
                     }
                 }
             } catch (InterruptedException e) {
-                logger.error(Thread.currentThread().getName() + " InterruptedException: " +  e);
+                logger.error(Thread.currentThread().getName() + " InterruptedException: " +  e + "\nurl:" + url);
             } catch (Exception e) {
-                logger.error(Thread.currentThread().getName() + " Exception: " + e);
+                logger.error(Thread.currentThread().getName() + " Exception: " + e + "\nurl:" + url);
+            }finally {
             }
         }
 
@@ -160,6 +156,13 @@ public class Fetcher {
     }
 
     public void after(){
+        while (((ThreadPoolExecutor)threadPool.getService()).getQueue().size() != 0) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         threadPool.close();
     }
 
@@ -174,6 +177,10 @@ public class Fetcher {
                     waitNewUrl();
                 }
                 String finalUrl = url;
+                if (fetchCounted.get() > Config.FETCH_COUNT) {
+                    runStatus = EXIT;
+
+                }
                 execute(new FecherThread(finalUrl, request));
 
             } catch (InterruptedException e) {
@@ -199,12 +206,12 @@ public class Fetcher {
             public void run() {
                 try {
                     runnable.run();
-                }finally {
+                } finally {
                     reentrantLock.lock();
                     try {
                         activeThreadCondition.signalAll();
                         threadPool.getActiveThread().decrementAndGet();
-                    }finally {
+                    } finally {
                         reentrantLock.unlock();
                     }
                 }
@@ -232,7 +239,7 @@ public class Fetcher {
 
     public void init(){
         activeThread = new AtomicInteger(0);
-        fetchCount = new AtomicInteger(0);
+        fetchCounted = new AtomicLong(0);
         request = new HttpRequest().setPoolSize(poolSize);
     }
 
@@ -250,7 +257,9 @@ public class Fetcher {
         }
     }
 
-
+    public boolean isClose(){
+        return threadPool.getService().isTerminated();
+    }
 
     public Scheduler getScheduler() {
         return scheduler;
@@ -310,10 +319,6 @@ public class Fetcher {
 
     public AtomicInteger getActiveThread() {
         return activeThread;
-    }
-
-    public AtomicInteger getFetchCount() {
-        return fetchCount;
     }
 
     public int getPoolSize() {
