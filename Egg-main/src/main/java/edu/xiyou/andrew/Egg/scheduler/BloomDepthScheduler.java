@@ -32,7 +32,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class BloomDepthScheduler extends SchedulerMonitor implements Scheduler{
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private BloomFilter<String> bloomFilter = new BloomFilter<String>(Config.BLOOMFILTER_ERROR_RATE, Config.FETCH_COUNT);
+    private BloomFilter<String> bloomFilter = new BloomFilter<String>(Config.BLOOMFILTER_ERROR_RATE, Config.BLOOMFILTER_RATE);
     private BlockingQueue<String> currentQueue = new LinkedBlockingQueue<String>();
     private BlockingQueue<String> nextQueue = new LinkedBlockingQueue<String>();
 

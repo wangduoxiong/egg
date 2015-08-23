@@ -32,7 +32,8 @@ public class Config {
     public static int interval = INTERVAL_JUST_ONE;
 
     public static final int FETCH_COUNT =  10000;
-    public static final double BLOOMFILTER_ERROR_RATE = 0.001;
+    public static final int BLOOMFILTER_RATE = 10*1000*1000;
+    public static final double BLOOMFILTER_ERROR_RATE = 0.0001;
 
     public static int THREAD_COUNT = 16;
 
