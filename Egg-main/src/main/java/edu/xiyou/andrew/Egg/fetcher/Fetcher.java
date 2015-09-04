@@ -24,6 +24,7 @@ import edu.xiyou.andrew.Egg.parser.Handler;
 import edu.xiyou.andrew.Egg.parser.Html;
 import edu.xiyou.andrew.Egg.scheduler.BloomDepthScheduler;
 import edu.xiyou.andrew.Egg.scheduler.Scheduler;
+import edu.xiyou.andrew.Egg.scheduler.SchedulerMonitor;
 import edu.xiyou.andrew.Egg.thread.ThreadPool;
 import edu.xiyou.andrew.Egg.utils.Config;
 import org.apache.commons.lang3.StringUtils;
@@ -126,6 +127,7 @@ public class Fetcher extends FetcherMonitor{
             } catch (Exception e) {
                 logger.error(Thread.currentThread().getName() + " Exception: " + e + "\nurl:" + url);
             }finally {
+                pollCount.incrementAndGet();
             }
         }
 
@@ -173,9 +175,19 @@ public class Fetcher extends FetcherMonitor{
         while (!Thread.currentThread().isInterrupted() && (runStatus == RUNNING)) {
             try {
                 String url;
+                int nullCount = 0;
                 while ((url = scheduler.poll()) == null) {
                     waitNewUrl();
+                    nullCount++;
+                    if (nullCount == Config.NULL_COUNT){
+                        runStatus = EXIT;
+                        break;
+                    }
                 }
+                System.out.println("scheduler request count " + ((SchedulerMonitor)scheduler).getRequestedCount() + "\n");
+                System.out.println("Scheduler request total count +" + ((SchedulerMonitor) scheduler).getTotalRequestCount() + "\n");
+                System.out.printf("\nfetchCounted:" + fetchCounted.get() + "\n");
+
                 String finalUrl = url;
                 if (fetchCounted.get() > Config.FETCH_COUNT) {
                     runStatus = EXIT;

@@ -39,8 +39,10 @@ public class BloomScheduler extends SchedulerMonitor implements Scheduler {
 
     @Override
     public String poll() throws InterruptedException {
-        takeTaskCount.incrementAndGet();
         String url = queue.poll(3000, TimeUnit.MILLISECONDS);
+        if (url != null){
+            takeTaskCount.incrementAndGet();
+        }
         logger.info("poll url: " + url);
         return url;
     }
