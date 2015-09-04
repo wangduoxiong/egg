@@ -7,12 +7,12 @@
     <parent>
         <groupId>edu.xiyou</groupId>
         <artifactId>Egg</artifactId>
-        <version>1.4-SNAPSHOT</version>
+        <version>1.41</version>
     </parent>
 
     <groupId>edu.xiyou</groupId>
     <artifactId>Egg-main</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.41</version>
 
     <dependencies>
 
