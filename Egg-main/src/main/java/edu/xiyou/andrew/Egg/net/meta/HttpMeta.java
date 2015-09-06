@@ -1,4 +1,4 @@
-package edu.xiyou.andrew.Egg.utils;
+package edu.xiyou.andrew.Egg.net.meta;
 
 /**
  * Created by andrew on 15-8-18.
