@@ -58,10 +58,15 @@ public class HttpRequest implements Request{
         if ((datum == null) || siteIsBlank(datum.getSite())){
             return null;
         }
-        CrawlDatum.Site site = datum.getSite();
-        CloseableHttpClient httpClient = generateRequest(site);
-        HttpUriRequest httpUriRequest = getHttpUriRequest(datum, new HashMap<String, String>());
-        HttpResponse response = httpClient.execute(httpUriRequest);
+        HttpResponse response = null;
+        try {
+            CrawlDatum.Site site = datum.getSite();
+            CloseableHttpClient httpClient = generateRequest(site);
+            HttpUriRequest httpUriRequest = getHttpUriRequest(datum, new HashMap<String, String>());
+            response = httpClient.execute(httpUriRequest);
+        }catch (Exception e){
+            logger.error("op=getResponse, exception " + e.getMessage());
+        }
         return handlerResponse(datum, response);
     }
 

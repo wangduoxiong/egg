@@ -114,7 +114,6 @@ public class Fetcher extends FetcherMonitor{
                             }else {
                                 handler.onSuccess(html);
                                 fetchCounted.incrementAndGet();
-                                System.out.printf("\nfetchCounted:" + fetchCounted.get() + "\n");
                                 List<String> urlList = handler.handleAndGetLinks(html);
                                 addSeed(urlList);
                                 logger.info(FETCH_OUTPUT_STRING + "fetched sucess");
@@ -162,7 +161,7 @@ public class Fetcher extends FetcherMonitor{
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.info("op=after,exception " + e.getMessage());
             }
         }
         threadPool.close();
@@ -184,9 +183,6 @@ public class Fetcher extends FetcherMonitor{
                         break;
                     }
                 }
-                System.out.println("scheduler request count " + ((SchedulerMonitor)scheduler).getRequestedCount() + "\n");
-                System.out.println("Scheduler request total count +" + ((SchedulerMonitor) scheduler).getTotalRequestCount() + "\n");
-                System.out.printf("\nfetchCounted:" + fetchCounted.get() + "\n");
 
                 String finalUrl = url;
                 if (fetchCounted.get() > Config.FETCH_COUNT) {
