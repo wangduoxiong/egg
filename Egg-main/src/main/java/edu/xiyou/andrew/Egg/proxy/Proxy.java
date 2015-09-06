@@ -20,7 +20,7 @@ public class Proxy extends ToStringUtils implements Delayed{
 
     private int reuseTimeinterval =  1500;
     private Long canUseTime = 0L;
-    private Long lastBorrowTime = System.currentTimeMillis();
+    private Long lastBorrowTime = System.nanoTime();
     private Long responseTime = 0L;
 
     private int failNum = 0;
@@ -31,17 +31,17 @@ public class Proxy extends ToStringUtils implements Delayed{
     public Proxy(HttpHost host, int reuseTimeinterval){
         this.httpHost = host;
         this.reuseTimeinterval = reuseTimeinterval;
-        this.canUseTime = System.currentTimeMillis() + reuseTimeinterval;
+        this.canUseTime = System.nanoTime() + reuseTimeinterval;
     }
 
     public Proxy(HttpHost host){
         httpHost = host;
-        canUseTime = System.currentTimeMillis() + reuseTimeinterval;
+        canUseTime = System.nanoTime() + reuseTimeinterval;
     }
 
     public void recordResponse(){
-        this.responseTime = (System.currentTimeMillis() - lastBorrowTime)/2;
-        this.lastBorrowTime = System.currentTimeMillis();
+        this.responseTime = (System.nanoTime() - lastBorrowTime)/2;
+        this.lastBorrowTime = System.nanoTime();
     }
 
     public void setFailType(int type){
@@ -71,12 +71,16 @@ public class Proxy extends ToStringUtils implements Delayed{
 
     @Override
     public long getDelay(TimeUnit timeUnit) {
-        return 0;
+        return timeUnit.convert(canUseTime - System.nanoTime(), timeUnit);
     }
 
     @Override
     public int compareTo(Delayed delayed) {
-        return 0;
+        if (delayed == this){
+            return 0;
+        }
+        long canUseTime = delayed.getDelay(TimeUnit.NANOSECONDS);
+        return this.canUseTime > canUseTime ? 1 : (this.canUseTime == canUseTime ? 0 : -1);
     }
 
     public Long getLastBorrowTime() {
@@ -93,5 +97,9 @@ public class Proxy extends ToStringUtils implements Delayed{
 
     public List<Integer> getFailedErrorType() {
         return failedErrorType;
+    }
+
+    public Long getResponseTime() {
+        return responseTime;
     }
 }
