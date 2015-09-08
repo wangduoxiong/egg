@@ -26,14 +26,16 @@ public class PropertiesUtils {
     private static final Logger logger = LoggerFactory.getLogger(PropertiesUtils.class);
 
     private static final ImmutableMap<Object, Object> functionMap = ImmutableMap.builder()
-            .put("address", getMethodByName("setAddress"))
             .put("hostname", getMethodByName("setHostName"))
             .put("port", getMethodByName("setPort"))
             .put("schemeName", getMethodByName("setSchemeName")).build();
 
     public static List<Proxy> getProxysFromProperties(String filePath) throws IOException {
         Properties properties = new Properties();
-        properties.load(new FileInputStream(new File(filePath)));
+//        properties.load(Thread.currentThread().getContextClassLoader().getResourceAsStream(filePath));
+        properties.load(PropertiesUtils.class.getClassLoader().getResourceAsStream(filePath));
+
+//        properties.load(new FileInputStream(new File(filePath)));
         Iterator iterator = properties.entrySet().iterator();
         List<Proxy> list = Lists.newArrayList();
 
@@ -56,7 +58,7 @@ public class PropertiesUtils {
             Method method = (Method) functionMap.get(keys[keys.length - 1]);
             if (method != null){
                 try {
-                    method.invoke(host, value);
+                    method.invoke(null, host, value);
                 } catch (IllegalAccessException e) {
                     logger.error("op=getProxyFromProperties, e", e);
                 } catch (InvocationTargetException e) {
@@ -74,22 +76,22 @@ public class PropertiesUtils {
     private static Method getMethodByName(String methodName){
         Method method = null;
         try {
-            method = clazz.getMethod(methodName, Host.class, Integer.class);
+            method = clazz.getDeclaredMethod(methodName, Host.class, String.class);
         } catch (NoSuchMethodException e) {
             logger.error("op=getMethodByName, methodName={} , exception: ", methodName, e.getMessage());
         }
         return method;
     }
 
-    private static void setPort(Host host, Integer port){
-        host.setPort(port);
+    private static void setPort(Host host, String port){
+        host.setPort(Integer.parseInt(port));
     }
 
     private static void setSchemeName(Host host, String schemeName){
         host.setSchemeName(schemeName);
     }
 
-    public static void setHostName(Host host, String hostName){
+    private static void setHostName(Host host, String hostName){
         host.setHostName(hostName);
     }
 
