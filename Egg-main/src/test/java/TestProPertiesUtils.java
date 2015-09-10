@@ -1,5 +1,5 @@
 import edu.xiyou.andrew.Egg.proxy.Proxy;
-import edu.xiyou.andrew.Egg.utils.PropertiesUtils;
+import edu.xiyou.andrew.Egg.proxy.ProxyPropertiesService;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -12,7 +12,7 @@ public class TestProPertiesUtils {
     @Test
     public void getProperties(){
         try {
-            List<Proxy> list = PropertiesUtils.getProxysFromProperties("proxy.properties");
+            List<Proxy> list = ProxyPropertiesService.getProxysFromProperties("proxy.properties");
             System.out.println(list);
         } catch (IOException e) {
             e.printStackTrace();

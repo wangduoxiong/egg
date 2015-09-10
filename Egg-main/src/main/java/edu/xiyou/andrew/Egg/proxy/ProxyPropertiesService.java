@@ -1,15 +1,12 @@
-package edu.xiyou.andrew.Egg.utils;
+package edu.xiyou.andrew.Egg.proxy;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import edu.xiyou.andrew.Egg.proxy.Proxy;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -19,11 +16,12 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
+ * 自动查找工程下资源文件里的配置文件
  * Created by andrew on 15-9-6.
  */
-public class PropertiesUtils {
-    private static final Class clazz = PropertiesUtils.class;
-    private static final Logger logger = LoggerFactory.getLogger(PropertiesUtils.class);
+public class ProxyPropertiesService {
+    private static final Class clazz = ProxyPropertiesService.class;
+    private static final Logger logger = LoggerFactory.getLogger(ProxyPropertiesService.class);
 
     private static final ImmutableMap<Object, Object> functionMap = ImmutableMap.builder()
             .put("hostname", getMethodByName("setHostName"))
@@ -33,9 +31,8 @@ public class PropertiesUtils {
     public static List<Proxy> getProxysFromProperties(String filePath) throws IOException {
         Properties properties = new Properties();
 //        properties.load(Thread.currentThread().getContextClassLoader().getResourceAsStream(filePath));
-        properties.load(PropertiesUtils.class.getClassLoader().getResourceAsStream(filePath));
+        properties.load(ProxyPropertiesService.class.getClassLoader().getResourceAsStream(filePath));
 
-//        properties.load(new FileInputStream(new File(filePath)));
         Iterator iterator = properties.entrySet().iterator();
         List<Proxy> list = Lists.newArrayList();
 

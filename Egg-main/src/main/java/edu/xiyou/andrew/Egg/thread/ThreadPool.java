@@ -55,37 +55,6 @@ public class ThreadPool {
         service = Executors.newFixedThreadPool(this.poolSize);
     }
 
-//    public synchronized void execute(final Runnable runnable){
-//        if (activeThread.get() >= poolSize){
-//            reentrantLock.lock();
-//            try {
-//                while (activeThread.get() < poolSize){
-//                    condition.await();
-//                }
-//            } catch (InterruptedException e) {
-//            }finally {
-//                reentrantLock.unlock();
-//            }
-//        }
-//        activeThread.getAndDecrement();
-//        service.execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    runnable.run();
-//                }finally {
-//                    reentrantLock.lock();
-//                    try {
-//                        activeThread.decrementAndGet();
-//                        condition.signalAll();
-//                    }finally {
-//                        reentrantLock.unlock();
-//                    }
-//
-//                }
-//            }
-//        });
-//    }
     public void execute(Runnable runnable){
         service.execute(runnable);
     }
@@ -109,18 +78,4 @@ public class ThreadPool {
         return activeThread;
     }
 
-
-    //    static class Task implements Runnable{
-//
-//        @Override
-//        public void run() {
-//            System.out.println(Thread.currentThread().getName() + "----->" + activeThread.getAndIncrement());
-//        }
-//    }
-//    public static void main(String[] args) {
-//        ThreadPool threadPool = new ThreadPool(5);
-//        for (int i = 0; i < 200; i++){
-//            threadPool.execute(new Task());
-//        }
-//    }
 }

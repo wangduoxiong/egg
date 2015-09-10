@@ -40,4 +40,6 @@ public class Config {
     public static long emptySleepTime = 3000;
 
     public static final int NULL_COUNT = 10;    //连续取出NULL_COUNT次url则退出
+
+    public static final boolean useProxy = false; //是否使用代理
 }
