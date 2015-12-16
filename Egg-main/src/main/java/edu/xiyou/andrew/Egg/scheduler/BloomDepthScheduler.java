@@ -17,7 +17,7 @@ package edu.xiyou.andrew.Egg.scheduler;
  */
 
 
-import edu.xiyou.andrew.Egg.utils.BloomFilter;
+import edu.xiyou.andrew.Egg.scheduler.filter.BloomFilter;
 import edu.xiyou.andrew.Egg.utils.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +57,11 @@ public class BloomDepthScheduler extends SchedulerMonitor implements Scheduler{
                 }
             }
         }
+    }
+
+    @Override
+    public void clear() {
+
     }
 
     public void merge(){

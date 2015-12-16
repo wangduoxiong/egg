@@ -1,4 +1,4 @@
-package edu.xiyou.andrew.Egg.utils;
+package edu.xiyou.andrew.Egg.scheduler.filter;
 
 import java.io.Serializable;
 import java.nio.charset.Charset;
@@ -33,7 +33,7 @@ import java.util.Collection;
  * 中间遇到许多该算法的基础知识
  * 参考github(基本照抄)的原地址:https://github.com/MagnusS/Java-BloomFilter/blob/master/src/com/skjegstad/utils/BloomFilter.java
  */
-public class BloomFilter<E> implements Serializable {
+public class BloomFilter<E> implements Serializable, Filter<E> {
     private BitSet bitSet;                              //布隆过滤器的实体
     private int bitSetSize;                             //过滤器的大小
     private double bitsPerElement;                      //

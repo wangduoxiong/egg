@@ -34,4 +34,5 @@ public interface Scheduler {
      */
     public void offer(List<String> urls);
 
+    void clear();
 }

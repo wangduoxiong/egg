@@ -16,13 +16,14 @@ package edu.xiyou.andrew.Egg.scheduler;
  * limitations under the License.
  */
 
-import edu.xiyou.andrew.Egg.utils.BloomFilter;
+import edu.xiyou.andrew.Egg.scheduler.filter.BloomFilter;
 import edu.xiyou.andrew.Egg.utils.Config;
 import org.apache.http.annotation.ThreadSafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -59,5 +60,11 @@ public class BloomScheduler extends SchedulerMonitor implements Scheduler {
                 }
             }
         }
+    }
+
+    @Override
+    public void clear() {
+        bloomFilter.clear();
+        queue.clear();
     }
 }
