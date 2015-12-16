@@ -60,6 +60,11 @@ public class BloomDepthScheduler extends SchedulerMonitor implements Scheduler{
     }
 
     @Override
+    public int currentCount() {
+        return currentQueue.size();
+    }
+
+    @Override
     public void clear() {
 
     }

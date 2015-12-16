@@ -63,6 +63,11 @@ public class BloomScheduler extends SchedulerMonitor implements Scheduler {
     }
 
     @Override
+    public int currentCount() {
+        return queue.size();
+    }
+
+    @Override
     public void clear() {
         bloomFilter.clear();
         queue.clear();

@@ -45,6 +45,11 @@ public class HashSetScheduler extends SchedulerMonitor implements Scheduler{
     }
 
     @Override
+    public int currentCount() {
+        return queue.size();
+    }
+
+    @Override
     public void clear() {
         queue.clear();
         hashSetFilter.clear();
