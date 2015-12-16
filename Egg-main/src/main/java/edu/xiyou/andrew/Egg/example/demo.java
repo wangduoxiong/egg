@@ -23,7 +23,15 @@ public class demo {
     public static void main(String[] args) throws InterruptedException {
         Scheduler scheduler1 = new BloomScheduler();
         Long startTime = System.currentTimeMillis();
+
+        /**
+         * Handler 接口是处理爬取网页后的页面的接口
+         */
         Fetcher fetcher = new Fetcher(scheduler1, new Handler() {
+            /**
+             * 抓取成功是的操作
+             * @param response
+             */
             @Override
             public void onSuccess(Response response) {
                 String path = "/home/andrew/Data/baike/data/";
@@ -35,11 +43,20 @@ public class demo {
                 }
             }
 
+            /**
+             * 失败的操作
+             * @param response
+             */
             @Override
             public void onFail(Response response) {
 
             }
 
+            /**
+             * 获取下一次爬取页面的操作
+             * @param response
+             * @return
+             */
             @Override
             public List<String> handleAndGetLinks(Response response) {
                 LinksList list = new LinksList();
