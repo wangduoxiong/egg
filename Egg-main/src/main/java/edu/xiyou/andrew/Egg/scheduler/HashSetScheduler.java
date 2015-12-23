@@ -39,7 +39,7 @@ public class HashSetScheduler extends SchedulerMonitor implements Scheduler{
                 hashSetFilter.add(url);
                 queue.offer(url);
                 takeTaskCount.getAndIncrement();
-                LOG.info("offer url : ", url);
+                LOG.info("offer url : " + url);
             }
         }
     }
