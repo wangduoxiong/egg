@@ -6,6 +6,7 @@ import edu.xiyou.andrew.Egg.parser.LinksList;
 import edu.xiyou.andrew.Egg.parser.Response;
 import edu.xiyou.andrew.Egg.scheduler.BloomScheduler;
 import edu.xiyou.andrew.Egg.scheduler.Scheduler;
+import edu.xiyou.andrew.Egg.utils.Config;
 import edu.xiyou.andrew.Egg.utils.FileUtils;
 import edu.xiyou.andrew.Egg.utils.RegexRule;
 import org.jsoup.Jsoup;
@@ -67,6 +68,7 @@ public class demo {
                 return list;
             }
         }, 0);
+        Config.cookies.put("key", "value");
         fetcher.init();
         fetcher.before();
         fetcher.setScheduler(scheduler1);

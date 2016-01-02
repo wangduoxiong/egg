@@ -63,5 +63,4 @@ public interface Response {
      */
     public ProtocolVersion getProtocolVersion();
 
-
 }

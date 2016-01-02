@@ -147,6 +147,9 @@ public class Fetcher extends FetcherMonitor{
         private CrawlDatum getCrawDatum(String url){
             CrawlDatum datum = new CrawlDatum(url);
             datum.getSite().setUserAgent(Config.USER_AGENT);
+            if(Config.cookies.size() > 0){
+                datum.getSite().setCookies(Config.cookies);
+            }
             return datum;
         }
     }

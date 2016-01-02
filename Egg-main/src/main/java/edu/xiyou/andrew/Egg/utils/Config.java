@@ -16,6 +16,13 @@ package edu.xiyou.andrew.Egg.utils;
  * limitations under the License.
  */
 
+
+import com.google.common.collect.ImmutableBiMap;
+import com.google.common.collect.Maps;
+
+import java.util.Map;
+
+
 /**
  * 设置爬虫的全局桉树参数
  * Created by andrew on 15-5-21.
@@ -23,6 +30,8 @@ package edu.xiyou.andrew.Egg.utils;
 public class Config {
 
     public static final String USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/43.0.2357.130 Chrome/43.0.2357.130 Safari/537.36";
+
+    public static final Map cookies = Maps.newHashMap();
 
     public static final int RETRY = 3;
 
