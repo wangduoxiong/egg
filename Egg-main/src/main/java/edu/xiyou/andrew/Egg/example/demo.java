@@ -68,7 +68,7 @@ public class demo {
                 return list;
             }
         }, 0);
-        Config.cookies.put("key", "value");
+//        Config.cookies.put("key", "value");
         fetcher.init();
         fetcher.before();
         fetcher.setScheduler(scheduler1);
