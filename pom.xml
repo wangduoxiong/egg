@@ -8,7 +8,7 @@
     <name>Egg</name>
     <description>一个通用爬虫</description>
     <artifactId>Egg</artifactId>
-    <version>0.1.41</version>
+    <version>0.2.00</version>
     <url>https://github.com/wangduoxiong/Egg.git</url>
     <packaging>pom</packaging>
 
