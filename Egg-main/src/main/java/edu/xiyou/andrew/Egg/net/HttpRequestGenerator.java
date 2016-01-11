@@ -1,5 +1,6 @@
 package edu.xiyou.andrew.Egg.net;
 
+import edu.xiyou.andrew.Egg.model.CrawlDatum;
 import edu.xiyou.andrew.Egg.utils.Config;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;

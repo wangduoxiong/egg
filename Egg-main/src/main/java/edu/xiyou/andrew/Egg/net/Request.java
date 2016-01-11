@@ -21,6 +21,8 @@ package edu.xiyou.andrew.Egg.net;
  */
 
 
+import edu.xiyou.andrew.Egg.model.CrawlDatum;
+import edu.xiyou.andrew.Egg.model.Site;
 import edu.xiyou.andrew.Egg.parser.Response;
 
 /**
@@ -34,5 +36,5 @@ public interface Request {
      * @param datum 种子
      * @return 回应的具体内容
      */
-    Response getResponse(CrawlDatum datum) throws Exception;
+    Response getResponse(CrawlDatum datum, Site site) throws Exception;
 }

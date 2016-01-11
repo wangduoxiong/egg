@@ -17,7 +17,7 @@ package edu.xiyou.andrew.Egg.scheduler.dbUpdater;
  */
 
 
-import edu.xiyou.andrew.Egg.net.CrawlDatum;
+import edu.xiyou.andrew.Egg.model.CrawlDatum;
 
 import java.util.List;
 import java.util.Map;

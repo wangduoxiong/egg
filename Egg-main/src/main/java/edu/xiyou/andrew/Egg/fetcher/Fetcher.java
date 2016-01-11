@@ -17,14 +17,13 @@ package edu.xiyou.andrew.Egg.fetcher;
  */
 
 
-import edu.xiyou.andrew.Egg.net.CrawlDatum;
+import edu.xiyou.andrew.Egg.model.CrawlDatum;
 import edu.xiyou.andrew.Egg.net.HttpRequest;
 import edu.xiyou.andrew.Egg.net.Request;
 import edu.xiyou.andrew.Egg.parser.Handler;
 import edu.xiyou.andrew.Egg.parser.Html;
 import edu.xiyou.andrew.Egg.scheduler.BloomDepthScheduler;
 import edu.xiyou.andrew.Egg.scheduler.Scheduler;
-import edu.xiyou.andrew.Egg.scheduler.SchedulerMonitor;
 import edu.xiyou.andrew.Egg.thread.ThreadPool;
 import edu.xiyou.andrew.Egg.utils.Config;
 import org.apache.commons.lang3.StringUtils;

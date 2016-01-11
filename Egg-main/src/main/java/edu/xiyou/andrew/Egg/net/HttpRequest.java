@@ -1,5 +1,6 @@
 package edu.xiyou.andrew.Egg.net;
 
+import edu.xiyou.andrew.Egg.model.CrawlDatum;
 import edu.xiyou.andrew.Egg.parser.Html;
 import edu.xiyou.andrew.Egg.parser.Response;
 import edu.xiyou.andrew.Egg.utils.Config;
