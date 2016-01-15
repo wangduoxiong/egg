@@ -25,7 +25,6 @@ import java.util.regex.Pattern;
  * Created by andrew on 15-6-7.
  */
 
-@Deprecated
 public class RegexRule {
     private List<String> positive;
     private List<String> negative;

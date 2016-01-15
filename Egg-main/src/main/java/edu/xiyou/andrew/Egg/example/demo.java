@@ -7,6 +7,7 @@ import edu.xiyou.andrew.Egg.net.Response;
 import edu.xiyou.andrew.Egg.scheduler.BloomScheduler;
 import edu.xiyou.andrew.Egg.scheduler.Scheduler;
 import edu.xiyou.andrew.Egg.utils.RegexRule;
+import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 
 import java.io.File;
@@ -36,8 +37,7 @@ public class demo {
                 String path = "/home/andrew/Data/baike/data/";
                 String fileName = path + System.nanoTime();
                 try {
-                    FileUtils.write2File(new File(fileName), response.getContent());
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }

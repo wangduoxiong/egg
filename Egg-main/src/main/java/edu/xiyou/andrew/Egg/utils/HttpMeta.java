@@ -3,9 +3,9 @@ package edu.xiyou.andrew.Egg.utils;
 /**
  * Created by andrew on 15-8-18.
  */
-public interface HttpMeta {
+public final class HttpMeta {
 
-    public static class Method{
+    public final static class Method{
         public static final String GET = "GET";
 
         public static final String HEAD = "HEAD";
@@ -21,7 +21,7 @@ public interface HttpMeta {
         public static final String CONNECT = "CONNECT";
     }
 
-    public static interface Header{
+    public final static class Header{
 
         public static final String REFERER = "Referer";
 

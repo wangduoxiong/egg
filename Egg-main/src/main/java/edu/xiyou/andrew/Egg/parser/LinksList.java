@@ -26,6 +26,7 @@ import java.util.LinkedList;
 /**
  * Created by andrew on 15-6-7.
  */
+@Deprecated
 public class LinksList<E> extends LinkedList<String>{
 
     public void getLinkByA(Document document, RegexRule regexRule){

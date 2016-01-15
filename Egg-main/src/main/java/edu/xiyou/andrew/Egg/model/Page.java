@@ -1,6 +1,7 @@
 package edu.xiyou.andrew.Egg.model;
 
 import com.google.common.collect.Maps;
+import edu.xiyou.andrew.Egg.parser.Parser;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
@@ -14,6 +15,7 @@ import java.util.Map;
  * Created by andrew on 16-1-10.
  */
 public class Page extends BaseModel{
+    private Site site;
     private CrawlDatum request;
     private Header[] headers;
     private StatusLine statusLine;
@@ -108,6 +110,15 @@ public class Page extends BaseModel{
 
     public Page setAllLinksList(List<String> allLinksList) {
         this.allLinksList = allLinksList;
+        return this;
+    }
+
+    public Site getSite() {
+        return site;
+    }
+
+    public Page setSite(Site site) {
+        this.site = site;
         return this;
     }
 }

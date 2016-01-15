@@ -16,6 +16,7 @@
 
     <dependencies>
 
+        <!-- Mozilla的编码识别包 -->
         <dependency>
             <groupId>com.googlecode.juniversalchardet</groupId>
             <artifactId>juniversalchardet</artifactId>

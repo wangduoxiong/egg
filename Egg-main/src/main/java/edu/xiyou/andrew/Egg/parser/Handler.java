@@ -37,10 +37,4 @@ public interface Handler {
      */
     public void onFail(Response response);
 
-    /**
-     * 得到下一次处理的链接
-     * @param response
-     * @return
-     */
-    public List<String> handleAndGetLinks(Response response);
 }
