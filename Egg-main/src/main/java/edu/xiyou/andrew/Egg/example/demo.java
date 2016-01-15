@@ -3,7 +3,7 @@ package edu.xiyou.andrew.Egg.example;
 import edu.xiyou.andrew.Egg.fetcher.Fetcher;
 import edu.xiyou.andrew.Egg.parser.Handler;
 import edu.xiyou.andrew.Egg.parser.LinksList;
-import edu.xiyou.andrew.Egg.parser.Response;
+import edu.xiyou.andrew.Egg.net.Response;
 import edu.xiyou.andrew.Egg.scheduler.BloomScheduler;
 import edu.xiyou.andrew.Egg.scheduler.Scheduler;
 import edu.xiyou.andrew.Egg.utils.RegexRule;

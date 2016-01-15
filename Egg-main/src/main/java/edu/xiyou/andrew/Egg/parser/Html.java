@@ -16,6 +16,7 @@ package edu.xiyou.andrew.Egg.parser;
  * limitations under the License.
  */
 
+import edu.xiyou.andrew.Egg.net.Response;
 import org.apache.http.Header;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.StatusLine;

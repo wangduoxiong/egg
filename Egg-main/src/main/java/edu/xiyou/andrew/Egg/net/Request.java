@@ -23,7 +23,6 @@ package edu.xiyou.andrew.Egg.net;
 
 import edu.xiyou.andrew.Egg.model.CrawlDatum;
 import edu.xiyou.andrew.Egg.model.Site;
-import edu.xiyou.andrew.Egg.parser.Response;
 
 /**
  * 进行获取任务的接口，定义了一个获取方法，通过

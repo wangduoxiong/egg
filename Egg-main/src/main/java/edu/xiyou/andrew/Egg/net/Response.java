@@ -1,4 +1,4 @@
-package edu.xiyou.andrew.Egg.parser;
+package edu.xiyou.andrew.Egg.net;
 
 
 import org.apache.http.Header;
