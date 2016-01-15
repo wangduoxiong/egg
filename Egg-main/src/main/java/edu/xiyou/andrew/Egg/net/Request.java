@@ -21,7 +21,8 @@ package edu.xiyou.andrew.Egg.net;
  */
 
 
-import edu.xiyou.andrew.Egg.parser.Response;
+import edu.xiyou.andrew.Egg.model.CrawlDatum;
+import edu.xiyou.andrew.Egg.model.Site;
 
 /**
  * 进行获取任务的接口，定义了一个获取方法，通过
@@ -34,5 +35,5 @@ public interface Request {
      * @param datum 种子
      * @return 回应的具体内容
      */
-    Response getResponse(CrawlDatum datum) throws Exception;
+    Response getResponse(CrawlDatum datum, Site site) throws Exception;
 }

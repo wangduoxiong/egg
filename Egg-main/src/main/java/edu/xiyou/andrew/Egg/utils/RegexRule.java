@@ -21,8 +21,11 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
+ *  正则匹配的工具类
  * Created by andrew on 15-6-7.
  */
+
+@Deprecated
 public class RegexRule {
     private List<String> positive;
     private List<String> negative;

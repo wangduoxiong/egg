@@ -7,12 +7,12 @@
     <parent>
         <groupId>edu.xiyou</groupId>
         <artifactId>Egg</artifactId>
-        <version>0.1.41</version>
+        <version>0.2.00</version>
     </parent>
 
     <groupId>edu.xiyou</groupId>
     <artifactId>Egg-main</artifactId>
-    <version>0.1.41</version>
+    <version>0.2.00</version>
 
     <dependencies>
 
@@ -32,6 +32,12 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-io</artifactId>
             <version>1.3.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.sourceforge.htmlcleaner</groupId>
+            <artifactId>htmlcleaner</artifactId>
+            <version>2.15</version>
         </dependency>
 
     </dependencies>

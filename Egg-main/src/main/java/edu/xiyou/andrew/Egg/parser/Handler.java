@@ -16,6 +16,8 @@ package edu.xiyou.andrew.Egg.parser;
  * limitations under the License.
  */
 
+import edu.xiyou.andrew.Egg.net.Response;
+
 import java.util.List;
 
 /**

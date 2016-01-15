@@ -24,7 +24,7 @@ import java.util.Map;
 
 
 /**
- * 设置爬虫的全局桉树参数
+ * 设置爬虫参数
  * Created by andrew on 15-5-21.
  */
 public class Config {
