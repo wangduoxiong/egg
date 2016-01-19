@@ -1,14 +1,16 @@
 package edu.xiyou.andrew.Egg.parser;
 
+import edu.xiyou.andrew.Egg.net.Page;
+
 import java.util.List;
 
 /**
- * 解析器接口，用作解析 {@link edu.xiyou.andrew.Egg.model.Page}.<br>
+ * 解析器接口，用作解析 {@link Page}.<br>
  * Created by andrew on 16-1-11.
  */
 public interface Parser {
     /**
-     * 获取所有的{@link edu.xiyou.andrew.Egg.model.Page#rawText} <br>
+     * 获取所有的{@link Page#rawText} <br>
      * 的链接
      *
      * @return
@@ -63,7 +65,15 @@ public interface Parser {
     List<String> all();
 
     /**
+     * 获取目标列表的首元素
+     * @return
+     */
+    String get();
+
+    /**
      * 清除目标列表
      */
     void clear();
+
+    Parser setPage(Page page);
 }

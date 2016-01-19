@@ -1,6 +1,6 @@
 package edu.xiyou.andrew.Egg.parser;
 
-import edu.xiyou.andrew.Egg.model.Page;
+import edu.xiyou.andrew.Egg.net.Page;
 
 import java.util.List;
 

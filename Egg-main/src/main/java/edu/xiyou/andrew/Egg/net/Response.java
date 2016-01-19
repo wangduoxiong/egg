@@ -1,9 +1,14 @@
 package edu.xiyou.andrew.Egg.net;
 
 
+import edu.xiyou.andrew.Egg.model.CrawlDatum;
+import edu.xiyou.andrew.Egg.model.Site;
 import org.apache.http.Header;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.StatusLine;
+
+import java.util.List;
+import java.util.Map;
 /*
  * Copyright (c) 2015 Andrew-Wang.
  *
@@ -30,37 +35,67 @@ import org.apache.http.StatusLine;
  */
 public interface Response {
 
-    public String getUrl();
+    String getUrl();
 
     /**
      * 获取具体内容
      * @return 得到内容的字节数组
      */
-    public byte[] getContent();
+    byte[] getContent();
 
     /**
      * 获取所有的头部信息
      * @return
      */
-    public Header[] getAllHeaders();
+    Header[] getHeaders();
 
     /**
      * 获取对应的头部信息
      * @param name 头部的名字
      * @return 对应的头部信息
      */
-    public Header getHeader(String name);
+    Header getHeader(String name);
 
     /**
      * 获取回应的状态信息
      * @return
      */
-    public StatusLine getStatusLine();
+    StatusLine getStatusLine();
 
     /**
-     * 获取ProtocolVersion
+     * 返回处理之后的结果
      * @return
      */
-    public ProtocolVersion getProtocolVersion();
+    Map<String, String> getResults();
 
+    /**
+     * 查找特定的结果
+     * @param key
+     * @return
+     */
+    String getResult(String key);
+
+    /**
+     * 得到本页中所有的目标实体
+     * @return
+     */
+    List<CrawlDatum> getTargetRequestList();
+
+    /**
+     * 得到所有的目标文件
+     * @return
+     */
+    List<String> getAllLinksList();
+
+    /**
+     * 返回对应的站点信息及该站点的爬取设置
+     * @return
+     */
+    Site getSite();
+
+    /**
+     * 返回编码集的名称
+     * @return
+     */
+    String getCharSetName();
 }

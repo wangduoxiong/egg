@@ -1,6 +1,8 @@
 package edu.xiyou.andrew.Egg.net;
 
+import com.google.common.collect.ImmutableMap;
 import edu.xiyou.andrew.Egg.model.CrawlDatum;
+import edu.xiyou.andrew.Egg.model.Site;
 import edu.xiyou.andrew.Egg.parser.Html;
 import edu.xiyou.andrew.Egg.utils.Config;
 import edu.xiyou.andrew.Egg.utils.HttpMeta;
@@ -26,7 +28,16 @@ import java.util.Map;
  * Created by duoxiongwang on 15-8-17.
  */
 public class HttpRequest implements Request{
-    private final Logger logger = LoggerFactory.getLogger(HttpRequest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpRequest.class);
+
+    private final ImmutableMap<String, RequestBuilder> methodSelectMap = ImmutableMap.<String, RequestBuilder>builder()
+            .put(HttpMeta.Method.GET, RequestBuilder.get())
+            .put(HttpMeta.Method.POST, RequestBuilder.post())
+            .put(HttpMeta.Method.PUT, RequestBuilder.put())
+            .put(HttpMeta.Method.DELETE, RequestBuilder.delete())
+            .put(HttpMeta.Method.HEAD, RequestBuilder.head())
+            .put(HttpMeta.Method.TRACE, RequestBuilder.trace()).build();
+
 
     private HttpRequestGenerator httpRequestGenerator;
 
@@ -54,7 +65,7 @@ public class HttpRequest implements Request{
     }
 
     @Override
-    public Response getResponse(CrawlDatum datum) throws Exception {
+    public Response getResponse(CrawlDatum datum, Site site) throws Exception {
         if ((datum == null) || siteIsBlank(datum.getSite())){
             return null;
         }
@@ -105,25 +116,21 @@ public class HttpRequest implements Request{
     }
 
     private RequestBuilder selectRequestMethod(CrawlDatum datum){
-        String method = datum.method;
-        if ((method == null) || (method.equalsIgnoreCase(HttpMeta.Method.GET))) {
-            return RequestBuilder.get();
-        }else if(method.equalsIgnoreCase(HttpMeta.Method.POST)) {
-            RequestBuilder builder = RequestBuilder.post();
-            if (MapUtils.isNotEmpty(datum.getSite().getWireSign())) {
-                NameValuePair[] nameValuePairs = (NameValuePair[]) datum.getSite().getWireSign().get("nameValuePair");
-                if (nameValuePairs.length > 0) {
+        RequestBuilder builder = methodSelectMap.get(datum.getMethod());
+        if (builder == null){
+            LOGGER.error("method=selectRequestMethod, ill httpmethod={}", datum.getMethod());
+            builder = RequestBuilder.get();
+        }
+
+        if (HttpMeta.Method.POST.equals(datum.getMethod())){
+            if (MapUtils.isNotEmpty(datum.getExtra())){
+                NameValuePair[] nameValuePairs = (NameValuePair[]) datum.getExtra().get("nameValuePair");
+                if (nameValuePairs.length > 0){
                     builder.addParameters(nameValuePairs);
                 }
-                return builder;
             }
-        }else if (method.equalsIgnoreCase(HttpMeta.Method.HEAD)){
-            return RequestBuilder.head();
-        }else if (method.equalsIgnoreCase(HttpMeta.Method.DELETE)){
-            return RequestBuilder.delete();
-        }else if (method.equalsIgnoreCase(HttpMeta.Method.TRACE)){
-            return RequestBuilder.trace();
         }
-        throw new IllegalArgumentException("illegel Format method: " + method);
+        return builder;
     }
+
 }

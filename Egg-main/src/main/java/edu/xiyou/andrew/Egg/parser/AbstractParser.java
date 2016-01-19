@@ -2,9 +2,8 @@ package edu.xiyou.andrew.Egg.parser;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import edu.xiyou.andrew.Egg.model.Page;
-import edu.xiyou.andrew.Egg.utils.UrlUtils;
-import org.apache.commons.collections.ListUtils;
+import edu.xiyou.andrew.Egg.net.Page;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
@@ -33,6 +32,10 @@ public abstract class AbstractParser implements Parser {
     private List<String> targetList = Lists.newArrayList();
 
     private final static Pattern HREF_PATTERN = Pattern.compile("(<a[^>]*href=)['\"]([^'\">]*)['\"]", Pattern.CASE_INSENSITIVE);
+
+    public AbstractParser(Page page){
+        this.page = page;
+    }
 
     /**
      * 判断page是否为null，为null返回true, 否则false
@@ -197,9 +200,23 @@ public abstract class AbstractParser implements Parser {
         return page;
     }
 
-    public AbstractParser setPage(Page page) {
+    @Override
+    public Parser setPage(Page page) {
         this.page = page;
         return this;
+    }
+
+    @Override
+    public void clear(){
+        targetList.clear();
+    }
+
+    @Override
+    public String get(){
+        if (CollectionUtils.isEmpty(targetList)){
+            return "";
+        }
+        return targetList.get(0);
     }
 
     public List<String> getTargetList() {

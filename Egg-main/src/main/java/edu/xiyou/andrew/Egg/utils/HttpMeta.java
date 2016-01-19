@@ -18,7 +18,6 @@ public final class HttpMeta {
 
         public static final String TRACE = "TRACE";
 
-        public static final String CONNECT = "CONNECT";
     }
 
     public final static class Header{
