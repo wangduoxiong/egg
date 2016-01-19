@@ -10,7 +10,6 @@
         <version>0.2.00</version>
     </parent>
 
-    <groupId>edu.xiyou</groupId>
     <artifactId>Egg-main</artifactId>
     <version>0.2.00</version>
 

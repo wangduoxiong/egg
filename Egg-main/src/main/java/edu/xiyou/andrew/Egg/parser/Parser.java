@@ -1,9 +1,5 @@
 package edu.xiyou.andrew.Egg.parser;
 
-import edu.xiyou.andrew.Egg.model.Page;
-import edu.xiyou.andrew.Egg.model.Site;
-import edu.xiyou.andrew.Egg.utils.RegexRule;
-
 import java.util.List;
 
 /**
@@ -14,19 +10,30 @@ public interface Parser {
     /**
      * 获取所有的{@link edu.xiyou.andrew.Egg.model.Page#rawText} <br>
      * 的链接
+     *
      * @return
      */
     Parser getAllLink();
 
     /**
      * 根据正则匹配出需要的内容
+     *
      * @param regexStr
      * @return
      */
     Parser regex(String regexStr);
 
     /**
+     * 根据正则匹配需要的链接
+     *
+     * @param regexStr 正则表达式
+     * @return
+     */
+    Parser regexLinks(String regexStr);
+
+    /**
      * 根据Xpath匹配锁需要的内容
+     *
      * @param xpathStr
      * @return
      */
@@ -34,6 +41,7 @@ public interface Parser {
 
     /**
      * 根据css匹配需要的内容
+     *
      * @param cssStr
      * @return
      */
@@ -41,10 +49,21 @@ public interface Parser {
 
     /**
      * 解析出需要的字段
+     *
      * @param parseAble see{@link ParserAble}
      * @return
      */
     Parser parse(ParserAble parseAble);
 
+    /**
+     * 获取当前所有的匹配值
+     *
+     * @return
+     */
+    List<String> all();
+
+    /**
+     * 清除目标列表
+     */
     void clear();
 }

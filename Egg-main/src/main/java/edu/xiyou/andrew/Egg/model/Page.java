@@ -2,6 +2,7 @@ package edu.xiyou.andrew.Egg.model;
 
 import com.google.common.collect.Maps;
 import edu.xiyou.andrew.Egg.parser.Parser;
+import edu.xiyou.andrew.Egg.utils.UrlUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
@@ -15,9 +16,12 @@ import java.util.Map;
  * Created by andrew on 16-1-10.
  */
 public class Page extends BaseModel{
+    private static final String DEFAULT_CHARSET = "UTF-8";
+
     private Site site;
     private CrawlDatum request;
     private Header[] headers;
+    private String charSetName;
     private StatusLine statusLine;
     private byte[] rawText;
     private Map<String, String> results = Maps.newHashMap();
@@ -119,6 +123,26 @@ public class Page extends BaseModel{
 
     public Page setSite(Site site) {
         this.site = site;
+        return this;
+    }
+
+    public String getCharSetName() {
+        if (StringUtils.isBlank(charSetName)){
+            charSetName = this.getSite().getCharset();
+            if (StringUtils.isBlank(charSetName)) {
+                if (this.getRawText() == null){
+                    charSetName = DEFAULT_CHARSET;
+                }else {
+                    this.getSite().setCharset(UrlUtils.guessEncoding(this.getRawText()));
+                }
+                charSetName = this.getSite().getCharset();
+            }
+        }
+        return charSetName;
+    }
+
+    public Page setCharSetName(String charSetName) {
+        this.charSetName = charSetName;
         return this;
     }
 }

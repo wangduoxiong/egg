@@ -4,11 +4,20 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import edu.xiyou.andrew.Egg.model.Page;
 import edu.xiyou.andrew.Egg.utils.UrlUtils;
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.htmlcleaner.HtmlCleaner;
+import org.htmlcleaner.TagNode;
+import org.htmlcleaner.XPatherException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -58,11 +67,7 @@ public abstract class AbstractParser implements Parser {
             return this;
         }
 
-        String charSetName = page.getSite().getCharset();
-        if (StringUtils.isBlank(charSetName)) {
-            page.getSite().setCharset(UrlUtils.guessEncoding(page.getRawText()));
-            charSetName = page.getSite().getCharset();
-        }
+        String charSetName =page.getCharSetName();
         Matcher matcher;
         try {
             matcher = HREF_PATTERN.matcher(new String(page.getRawText(), charSetName));
@@ -80,9 +85,7 @@ public abstract class AbstractParser implements Parser {
                 urlCollection.add(matcher.group(2));
             }
         }
-        if (targetList.size() > 0) {
-            targetList.clear();
-        }
+        this.targetListIfNotEmptyClear();
         if (urlCollection != null) {
             targetList.addAll(urlCollection);
         }
@@ -91,25 +94,103 @@ public abstract class AbstractParser implements Parser {
 
     @Override
     public Parser regex(String regexStr) {
-        if (StringUtils.isBlank(regexStr)) {
+        if (checkCurrentCondition(regexStr)){
             return this;
+        }
+        this.targetListIfNotEmptyClear();
+        Pattern pattern = Pattern.compile(regexStr);
+        Matcher matcher;
+        try {
+            matcher = pattern.matcher(new String(page.getRawText(), page.getCharSetName()));
+        } catch (UnsupportedEncodingException e) {
+            LOGGER.debug("method=regex, Exception={}", e);
+            matcher = pattern.matcher(new String(page.getRawText()));
+        }
+        while (matcher.find()){
+            if (StringUtils.isNotEmpty(matcher.group())){
+                targetList.add(matcher.group());
+            }
+        }
+        return this;
+    }
+
+    @Override
+    public Parser regexLinks(String regex){
+        if (checkCurrentCondition(regex)){
+            return this;
+        }
+        List<String> tmpList;
+        tmpList = targetList.size() == 0 ? getAllLink().all() : targetList;
+        targetList.clear();
+        if ((null == tmpList) || (tmpList.size() == 0)){
+            return this;
+        }
+        Pattern pattern = Pattern.compile(regex);
+        for (String href : tmpList){
+            if (StringUtils.isBlank(href)){
+                continue;
+            }
+            Matcher matcher = pattern.matcher(href);
+            if (matcher.find()){
+                targetList.add(href);
+            }
         }
         return this;
     }
 
     @Override
     public Parser xpath(String xpathStr) {
-        return null;
+        if (checkCurrentCondition(xpathStr)){
+            return this;
+        }
+        targetListIfNotEmptyClear();
+        HtmlCleaner htmlCleaner = new HtmlCleaner();
+        TagNode tagNode;
+        try {
+             tagNode = htmlCleaner.clean(new String(page.getRawText(), page.getCharSetName()));
+        } catch (UnsupportedEncodingException e) {
+            LOGGER.info("method=xpath, Excpetion={}", e);
+            tagNode = htmlCleaner.clean(new String(page.getRawText()));
+        }
+        Object[] resultArray = new Object[0];
+        try {
+             resultArray = tagNode.evaluateXPath(xpathStr);
+        } catch (XPatherException e) {
+            LOGGER.error("method=xpath, Exception={}, xpath={}", e, xpathStr);
+
+        }
+        targetList.addAll(Arrays.<String>asList((String[]) resultArray));
+        return this;
     }
 
     @Override
     public Parser css(String cssStr) {
-        return null;
+        checkCurrentCondition(cssStr);
+        targetListIfNotEmptyClear();
+        Document document;
+        try {
+             document = Jsoup.parse(new String(page.getRawText(), page.getCharSetName()));
+        } catch (UnsupportedEncodingException e) {
+            document = Jsoup.parse(new String(page.getRawText()));
+        }
+        Elements elements = document.select(cssStr);
+        for (Element element : elements){
+            targetList.add(element.text());
+        }
+        return this;
     }
 
     @Override
     public Parser parse(ParserAble parseAble) {
-        return null;
+        checkCurrentCondition(parseAble);
+        targetListIfNotEmptyClear();
+        targetList.addAll(parseAble.parse());
+        return this;
+    }
+
+    @Override
+    public List<String> all(){
+        return targetList;
     }
 
     public Page getPage() {
@@ -128,5 +209,19 @@ public abstract class AbstractParser implements Parser {
     public AbstractParser setTargetList(List<String> targetList) {
         this.targetList = targetList;
         return this;
+    }
+
+    private void targetListIfNotEmptyClear(){
+        if (targetList.size() > 0) {
+            targetList.clear();
+        }
+    }
+    private <E>boolean checkCurrentCondition(E element){
+        if (pageNullReturn())
+            return true;
+        if (element instanceof String){
+            return StringUtils.isBlank((CharSequence) element);
+        }
+        return element == null;
     }
 }

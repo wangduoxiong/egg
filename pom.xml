@@ -21,7 +21,7 @@
 
     <modules>
         <module>Egg-main</module>
-        <module>Egg-Paster</module>
+        <module>Egg-paster</module>
         <module>Egg-views</module>
     </modules>
 
