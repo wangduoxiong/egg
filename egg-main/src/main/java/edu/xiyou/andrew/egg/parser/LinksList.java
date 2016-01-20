@@ -16,7 +16,6 @@ package edu.xiyou.andrew.egg.parser;
  * limitations under the License.
  */
 
-import edu.xiyou.andrew.egg.utils.RegexRule;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;

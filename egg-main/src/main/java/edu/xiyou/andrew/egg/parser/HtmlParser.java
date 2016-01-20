@@ -27,4 +27,7 @@ public class HtmlParser extends AbstractParser {
     private static final Logger LOGGER  = LoggerFactory.getLogger(AbstractParser.class);
 
 
+    public HtmlParser(Page page) {
+        super(page);
+    }
 }

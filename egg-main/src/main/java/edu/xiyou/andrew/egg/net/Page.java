@@ -3,7 +3,10 @@ package edu.xiyou.andrew.egg.net;
 import com.google.common.collect.Maps;
 import edu.xiyou.andrew.egg.model.CrawlDatum;
 import edu.xiyou.andrew.egg.model.Site;
+import edu.xiyou.andrew.egg.parser.HtmlParser;
+import edu.xiyou.andrew.egg.parser.Parser;
 import edu.xiyou.andrew.egg.utils.UrlUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
@@ -25,6 +28,7 @@ public class Page{
     private String charSetName;
     private StatusLine statusLine;
     private byte[] rawText;
+    private HtmlParser htmlParser;
     private Map<String, String> results = Maps.newHashMap();
     private List<String> allLinksList;
     private boolean needSave = true;                        //是否保存本页
@@ -43,6 +47,15 @@ public class Page{
             return null;
         }
         return request.getUrl();
+    }
+
+    public HtmlParser getHtmlParser() {
+        return htmlParser;
+    }
+
+    public Page setHtmlParser(HtmlParser htmlParser) {
+        this.htmlParser = htmlParser;
+        return this;
     }
 
     public byte[] getContent() {
@@ -119,6 +132,9 @@ public class Page{
     }
 
     public List<String> getAllLinksList() {
+        if (CollectionUtils.isEmpty(allLinksList)){
+            allLinksList = htmlParser.getAllLink().all();
+        }
         return allLinksList;
     }
 

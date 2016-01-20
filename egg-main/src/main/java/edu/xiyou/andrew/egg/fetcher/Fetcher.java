@@ -29,8 +29,8 @@ import edu.xiyou.andrew.egg.scheduler.BloomDepthScheduler;
 import edu.xiyou.andrew.egg.scheduler.Scheduler;
 import edu.xiyou.andrew.egg.thread.ThreadPool;
 import edu.xiyou.andrew.egg.utils.Config;
-import edu.xiyou.andrew.egg.utils.HttpMeta;
-import edu.xiyou.andrew.egg.utils.RegexRule;
+import edu.xiyou.andrew.egg.parser.RegexRule;
+import edu.xiyou.andrew.egg.utils.UrlUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -60,7 +60,6 @@ public class Fetcher extends FetcherMonitor {
 
     private Site site;
     private int depth;
-    private final Parser parser;
     private final Handler handler;
     private Scheduler scheduler;
     private RegexRule regexRule;
@@ -77,12 +76,11 @@ public class Fetcher extends FetcherMonitor {
     private volatile int runStatus = RUNNING;
     private volatile long emptySleepTime = Config.emptySleepTime;
 
-    public Fetcher(Scheduler scheduler, Handler handler, Parser parser, Site site,
+    public Fetcher(Scheduler scheduler, Handler handler, Site site,
                    List<DataProcessor> dataProcessorList, RegexRule regexRule,
                    RequestFactory requestFactory) {
         super();
         this.site = site;
-        this.parser = parser;
         this.handler = handler;
         this.scheduler = scheduler;
         this.regexRule = regexRule;
@@ -101,15 +99,13 @@ public class Fetcher extends FetcherMonitor {
     public static class Builder {
         private Scheduler scheduler;
         private Handler handler;
-        private Parser parser;
         private Site site;
         private List<DataProcessor> dataProcessorList;
         private RegexRule regexRule;
         private RequestFactory requestFactory;
 
         {
-            site = new Site();
-            parser = new HtmlParser();
+            site = new Site().setDomain(UrlUtils.acquireDomain());
             requestFactory = new HttpClientRequestFactory();
         }
 
@@ -120,11 +116,6 @@ public class Fetcher extends FetcherMonitor {
 
         public Builder setHandler(Handler handler) {
             this.handler = handler;
-            return this;
-        }
-
-        public Builder setParser(Parser parser) {
-            this.parser = parser;
             return this;
         }
 
@@ -144,7 +135,7 @@ public class Fetcher extends FetcherMonitor {
         }
 
         public Fetcher builder() {
-            return new Fetcher(scheduler, handler, parser, site, dataProcessorList, regexRule, requestFactory);
+            return new Fetcher(scheduler, handler, site, dataProcessorList, regexRule, requestFactory);
         }
     }
 
@@ -195,9 +186,11 @@ public class Fetcher extends FetcherMonitor {
                     }
                 }
             } catch (InterruptedException e) {
-                LOGGER.error(Thread.currentThread().getName() + " InterruptedException: " + e + "\ndatum:" + datum);
+                LOGGER.error(new StringBuffer().append(Thread.currentThread().getName()).
+                        append(" InterruptedException: ").append(e).append("\ndatum:" ).append(datum).toString());
             } catch (Exception e) {
-                LOGGER.error(Thread.currentThread().getName() + " Exception: " + e + "\ndatum:" + datum);
+                LOGGER.error(new StringBuffer(Thread.currentThread().getName()).append(" Exception: ").append(e).
+                        append("\ndatum:").append(datum).toString());
             } finally {
                 pollCount.incrementAndGet();
             }
@@ -374,10 +367,6 @@ public class Fetcher extends FetcherMonitor {
 
     public Scheduler getScheduler() {
         return scheduler;
-    }
-
-    public Parser getParser() {
-        return parser;
     }
 
     public Site getSite() {

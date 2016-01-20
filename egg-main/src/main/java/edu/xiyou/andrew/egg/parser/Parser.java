@@ -1,7 +1,6 @@
 package edu.xiyou.andrew.egg.parser;
 
 import edu.xiyou.andrew.egg.net.Page;
-import edu.xiyou.andrew.egg.utils.RegexRule;
 
 import java.util.List;
 
@@ -29,7 +28,7 @@ public interface Parser {
     /**
      * 根据正则匹配需要的链接
      *
-     * @param regex 正则表达式,{@link edu.xiyou.andrew.egg.utils.RegexRule}
+     * @param regex 正则表达式,{@link RegexRule}
      * @return
      */
     Parser regexLinks(RegexRule regex);
@@ -75,6 +74,4 @@ public interface Parser {
      * 清除目标列表
      */
     void clear();
-
-    Parser setPage(Page page);
 }

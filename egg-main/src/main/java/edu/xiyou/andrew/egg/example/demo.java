@@ -5,8 +5,9 @@ import edu.xiyou.andrew.egg.parser.Handler;
 import edu.xiyou.andrew.egg.parser.LinksList;
 import edu.xiyou.andrew.egg.net.Response;
 import edu.xiyou.andrew.egg.scheduler.BloomScheduler;
+import edu.xiyou.andrew.egg.scheduler.HashSetScheduler;
 import edu.xiyou.andrew.egg.scheduler.Scheduler;
-import edu.xiyou.andrew.egg.utils.RegexRule;
+import edu.xiyou.andrew.egg.parser.RegexRule;
 import org.jsoup.Jsoup;
 
 import java.util.Arrays;
@@ -18,51 +19,10 @@ import java.util.List;
  */
 public class demo {
     public static void main(String[] args) throws InterruptedException {
-        Scheduler scheduler1 = new BloomScheduler();
+        Scheduler scheduler = new HashSetScheduler();
         Long startTime = System.currentTimeMillis();
 
-        /**
-         * Handler 接口是处理爬取网页后的页面的接口
-         */
-        Fetcher fetcher = new Fetcher(scheduler1, new Handler() {
-            /**
-             * 抓取成功是的操作
-             * @param response
-             */
-            @Override
-            public void onSuccess(Response response) {
-                String path = "/home/andrew/Data/baike/data/";
-                String fileName = path + System.nanoTime();
-                try {
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            /**
-             * 失败的操作
-             * @param response
-             */
-            @Override
-            public void onFail(Response response) {
-
-            }
-
-            /**
-             * 获取下一次爬取页面的操作
-             * @param response
-             * @return
-             */
-            @Override
-            public List<String> handleAndGetLinks(Response response) {
-                LinksList list = new LinksList();
-                RegexRule regexRule = new RegexRule();
-                regexRule.addPositive(Collections.singletonList("http://baike.baidu.com/\\S+"));
-                regexRule.addNegative("http://baike.baidu.com/redirect/\\S+");
-                list.getLinkByA(Jsoup.parse(new String(response.getContent())), regexRule);
-                return list;
-            }
-        }, 0);
+        Fetcher fetcher =
 //        Config.cookies.put("key", "value");
         fetcher.init();
         fetcher.before();

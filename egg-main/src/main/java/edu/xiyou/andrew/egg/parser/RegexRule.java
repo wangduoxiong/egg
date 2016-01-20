@@ -1,4 +1,4 @@
-package edu.xiyou.andrew.egg.utils;
+package edu.xiyou.andrew.egg.parser;
 
 /*
  * Copyright (c) 2015 Andrew-Wang.
@@ -16,6 +16,8 @@ package edu.xiyou.andrew.egg.utils;
  * limitations under the License.
  */
 
+import com.google.common.collect.Lists;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -25,7 +27,7 @@ import java.util.regex.Pattern;
  * Created by andrew on 15-6-7.
  */
 
-public class RegexRule {
+public class RegexRule implements Selector<String>{
     private List<String> positive;
     private List<String> negative;
 
@@ -128,5 +130,21 @@ public class RegexRule {
 
     public List<String> getNegative(){
         return negative;
+    }
+
+    @Override
+    public boolean isTarget(String s) {
+        return satisfy(s);
+    }
+
+    @Override
+    public List<String> getAllTarget(List<String> elementList) {
+        List<String> targetList = Lists.newArrayList();
+        for (String url : elementList) {
+            if (satisfy(url)) {
+                targetList.add(url);
+            }
+        }
+        return targetList;
     }
 }
