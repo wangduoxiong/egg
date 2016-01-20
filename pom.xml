@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>edu.xiyou</groupId>
-    <name>Egg</name>
+    <name>egg</name>
     <description>一个通用爬虫</description>
-    <artifactId>Egg</artifactId>
+    <artifactId>egg</artifactId>
     <version>0.2.00</version>
     <url>https://github.com/wangduoxiong/Egg.git</url>
     <packaging>pom</packaging>
@@ -20,9 +20,9 @@
     </licenses>
 
     <modules>
-        <module>Egg-main</module>
-        <module>Egg-paster</module>
-        <module>Egg-views</module>
+        <module>egg-main</module>
+        <module>egg-paster</module>
+        <module>egg-views</module>
     </modules>
 
     <dependencies>
