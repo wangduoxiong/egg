@@ -58,7 +58,7 @@ public class JedisDbUpdater implements DbUpdater{
     public void write2Visited(List<CrawlDatum> datums) {
         Map<String, String> map = new HashMap<String, String>((int)(datums.size() / 0.75));
         for (CrawlDatum datum : datums){
-            map.put(datum.getSite().getUrl(), "" + datum.getFetchTime());
+//            map.put(datum.getSite().getUrl(), "" + datum.getFetchTime());
         }
         jedis.hmset(DbUpdater.VISITED_DB, map);
     }

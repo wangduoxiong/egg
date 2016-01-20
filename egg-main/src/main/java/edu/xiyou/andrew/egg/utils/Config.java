@@ -32,10 +32,6 @@ public class Config {
 
     public static final Map cookies = Maps.newHashMap();
 
-    public static final int RETRY = 3;
-
-    public static final int TTIME_OUT = 5000;
-
     public static final int INTERVAL_JUST_ONE = -1;
     public static int interval = INTERVAL_JUST_ONE;
 

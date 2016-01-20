@@ -1,6 +1,7 @@
 package edu.xiyou.andrew.egg.parser;
 
 import edu.xiyou.andrew.egg.net.Page;
+import edu.xiyou.andrew.egg.utils.RegexRule;
 
 import java.util.List;
 
@@ -28,10 +29,10 @@ public interface Parser {
     /**
      * 根据正则匹配需要的链接
      *
-     * @param regexStr 正则表达式
+     * @param regex 正则表达式,{@link edu.xiyou.andrew.egg.utils.RegexRule}
      * @return
      */
-    Parser regexLinks(String regexStr);
+    Parser regexLinks(RegexRule regex);
 
     /**
      * 根据Xpath匹配锁需要的内容

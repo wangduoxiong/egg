@@ -1,5 +1,7 @@
 package edu.xiyou.andrew.egg.scheduler;
 
+import com.google.common.collect.Queues;
+import edu.xiyou.andrew.egg.model.CrawlDatum;
 import edu.xiyou.andrew.egg.scheduler.filter.Filter;
 import edu.xiyou.andrew.egg.scheduler.filter.HashSetFilter;
 import org.apache.commons.lang3.StringUtils;
@@ -19,27 +21,27 @@ import java.util.concurrent.TimeUnit;
 public class HashSetScheduler extends SchedulerMonitor implements Scheduler{
     private final static Logger LOG = LoggerFactory.getLogger(HashSetScheduler.class);
 
-    private BlockingQueue queue = new LinkedBlockingQueue();
+    private BlockingQueue<CrawlDatum> queue = Queues.newLinkedBlockingQueue();
     private Filter<String> hashSetFilter = new HashSetFilter<String>();
 
     @Override
-    public synchronized String poll() throws InterruptedException {
-        String url = (String) queue.poll(3000, TimeUnit.MILLISECONDS);
-        if (url != null){
+    public synchronized CrawlDatum poll() throws InterruptedException {
+        CrawlDatum request = (CrawlDatum) queue.poll(3000, TimeUnit.MILLISECONDS);
+        if (request != null){
             takeTaskCount.incrementAndGet();
         }
-        LOG.info("poll url: " + url);
-        return url;
+        LOG.info("method=poll, url={}", request != null ? request.getUrl() : "");
+        return request;
     }
 
     @Override
-    public synchronized void offer(List<String> urls) {
-        for (String url : urls){
-            if (StringUtils.isNotEmpty(url) && (!hashSetFilter.contains(url))){
-                hashSetFilter.add(url);
-                queue.offer(url);
+    public synchronized void offer(List<CrawlDatum> requestList) {
+        for (CrawlDatum request : requestList){
+            if (StringUtils.isNotEmpty(request.getUrl()) && (!hashSetFilter.contains(request.getUrl()))){
+                hashSetFilter.add(request.getUrl());
+                queue.offer(request);
                 takeTaskCount.getAndIncrement();
-                LOG.info("offer url : " + url);
+                LOG.info("method=offer, url={}", request.getUrl());
             }
         }
     }

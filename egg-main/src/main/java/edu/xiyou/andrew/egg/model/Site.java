@@ -32,6 +32,8 @@ public class Site extends BaseModel{
 
     private long fetchCount = 1000;                         //在此站点抓取fetchCount数量个网页，-1不指定数目，直至抓取完毕为止
 
+    private int threadCount = 16;
+
     private Set<Integer> DEFAULT_ACCEPT_STATUS_CODE = Sets.newHashSet(200);
     private Set<Integer> acceptStatusCode = DEFAULT_ACCEPT_STATUS_CODE;
 
@@ -161,6 +163,15 @@ public class Site extends BaseModel{
 
     public Site setTimeout(int timeout) {
         this.timeout = timeout;
+        return this;
+    }
+
+    public int getThreadCount() {
+        return threadCount;
+    }
+
+    public Site setThreadCount(int threadCount) {
+        this.threadCount = threadCount;
         return this;
     }
 }

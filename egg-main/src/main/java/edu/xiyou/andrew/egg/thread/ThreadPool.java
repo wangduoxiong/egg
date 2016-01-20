@@ -29,7 +29,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Created by andrew on 15-6-7.
  */
 public class ThreadPool {
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(ThreadPool.class);
 
     private final int DEFAULT_POOL_SIZE = 8;
     private final int MAX_POOL_SIZE = 64;

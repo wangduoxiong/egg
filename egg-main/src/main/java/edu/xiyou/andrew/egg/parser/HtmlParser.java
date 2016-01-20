@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Created by andrew on 15-6-6.
  */
-public class Html extends AbstractParser {
+public class HtmlParser extends AbstractParser {
     private static final Logger LOGGER  = LoggerFactory.getLogger(AbstractParser.class);
 
 

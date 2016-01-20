@@ -17,47 +17,50 @@ package edu.xiyou.andrew.egg.scheduler;
  */
 
 
+import com.google.common.collect.Queues;
+import edu.xiyou.andrew.egg.model.CrawlDatum;
 import edu.xiyou.andrew.egg.scheduler.filter.BloomFilter;
 import edu.xiyou.andrew.egg.utils.Config;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by andrew on 15-6-7.
  */
 public class BloomDepthScheduler extends SchedulerMonitor implements Scheduler{
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final static Logger LOGGER = LoggerFactory.getLogger(BloomDepthScheduler.class);
 
     private BloomFilter<String> bloomFilter = new BloomFilter<String>(Config.BLOOMFILTER_ERROR_RATE, Config.BLOOMFILTER_RATE);
-    private BlockingQueue<String> currentQueue = new LinkedBlockingQueue<String>();
-    private BlockingQueue<String> nextQueue = new LinkedBlockingQueue<String>();
+    private BlockingQueue<CrawlDatum> currentQueue = Queues.newLinkedBlockingQueue();
+    private BlockingQueue<CrawlDatum> nextQueue = Queues.newLinkedBlockingQueue();
 
     @Override
-    public String poll() {
-        takeTaskCount.incrementAndGet();
-        try {
-            return currentQueue.take();
-        } catch (InterruptedException e) {
-            logger.info(e.getMessage());
-            return null;
+    public CrawlDatum poll() throws InterruptedException {
+        CrawlDatum datum = currentQueue.poll(3000, TimeUnit.MILLISECONDS);
+        if (datum.getUrl() != null) {
+            takeTaskCount.incrementAndGet();
         }
+        LOGGER.info("method=poll, url={}", datum.getUrl());
+        return datum;
     }
 
     @Override
-    public void offer(List<String> urls) {
-        synchronized (this) {
-            for (String url : urls) {
-                if ((url != null) && !bloomFilter.contains(url)) {
-                    putTaskCount.incrementAndGet();
-                    nextQueue.offer(url);
-                }
+    public synchronized void offer(List<CrawlDatum> requestList) {
+        for (CrawlDatum request : requestList){
+            if (StringUtils.isNotEmpty(request.getUrl()) && (!bloomFilter.contains(request.getUrl()))){
+                bloomFilter.add(request.getUrl());
+                nextQueue.offer(request);
+                takeTaskCount.getAndIncrement();
+                LOGGER.info("method=offer, url={}", request.getUrl());
             }
         }
     }
+
 
     @Override
     public int currentCount() {
@@ -66,16 +69,17 @@ public class BloomDepthScheduler extends SchedulerMonitor implements Scheduler{
 
     @Override
     public void clear() {
-
+        currentQueue.clear();
+        nextQueue.clear();
     }
 
     public void merge(){
         synchronized (this) {
-            logger.info("----> SchedulerQueue merge start <----");
+            LOGGER.info("----> SchedulerQueue merge start <----");
             currentQueue.clear();
             currentQueue.addAll(nextQueue);
             nextQueue.clear();
-            logger.info("----> SchedulerQueue merge end <----");
+            LOGGER.info("----> SchedulerQueue merge end <----");
         }
     }
 }

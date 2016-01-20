@@ -3,6 +3,7 @@ package edu.xiyou.andrew.egg.parser;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import edu.xiyou.andrew.egg.net.Page;
+import edu.xiyou.andrew.egg.utils.RegexRule;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.htmlcleaner.HtmlCleaner;
@@ -62,6 +63,7 @@ public abstract class AbstractParser implements Parser {
      * @return parser
      */
     public Parser getAllLink(boolean unique) {
+        this.targetListIfNotEmptyClear();
         if (pageNullReturn()) {
             return this;
         }
@@ -93,10 +95,10 @@ public abstract class AbstractParser implements Parser {
 
     @Override
     public Parser regex(String regexStr) {
+        this.targetListIfNotEmptyClear();
         if (checkCurrentCondition(regexStr)){
             return this;
         }
-        this.targetListIfNotEmptyClear();
         Pattern pattern = Pattern.compile(regexStr);
         Matcher matcher;
         try {
@@ -114,23 +116,22 @@ public abstract class AbstractParser implements Parser {
     }
 
     @Override
-    public Parser regexLinks(String regex){
-        if (checkCurrentCondition(regex)){
+    public Parser regexLinks(RegexRule regex){
+        this.targetListIfNotEmptyClear();
+        if (checkCurrentCondition(regex) || (regex.getPositive().size() <= 0)){
             return this;
         }
         List<String> tmpList;
-        tmpList = targetList.size() == 0 ? getAllLink().all() : targetList;
+        tmpList = getAllLink().all();
         targetList.clear();
         if ((null == tmpList) || (tmpList.size() == 0)){
             return this;
         }
-        Pattern pattern = Pattern.compile(regex);
         for (String href : tmpList){
             if (StringUtils.isBlank(href)){
                 continue;
             }
-            Matcher matcher = pattern.matcher(href);
-            if (matcher.find()){
+            if (regex.satisfy(href)){
                 targetList.add(href);
             }
         }
@@ -139,10 +140,10 @@ public abstract class AbstractParser implements Parser {
 
     @Override
     public Parser xpath(String xpathStr) {
+        this.targetListIfNotEmptyClear();
         if (checkCurrentCondition(xpathStr)){
             return this;
         }
-        targetListIfNotEmptyClear();
         HtmlCleaner htmlCleaner = new HtmlCleaner();
         TagNode tagNode;
         try {

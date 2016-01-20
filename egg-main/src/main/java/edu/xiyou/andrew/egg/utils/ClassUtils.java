@@ -17,6 +17,7 @@ import java.util.List;
  * 对指定包下的Class类进行操作
  * Created by andrew on 15-9-9.
  */
+@Deprecated
 public class ClassUtils {
 
     @SuppressWarnings("unchecked")

@@ -16,8 +16,11 @@ package edu.xiyou.andrew.egg.scheduler;
  * limitations under the License.
  */
 
+import com.google.common.collect.Queues;
+import edu.xiyou.andrew.egg.model.CrawlDatum;
 import edu.xiyou.andrew.egg.scheduler.filter.BloomFilter;
 import edu.xiyou.andrew.egg.utils.Config;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.annotation.ThreadSafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,33 +33,30 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by andrew on 15-6-7.
  */
-@ThreadSafe
 public class BloomScheduler extends SchedulerMonitor implements Scheduler {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final static Logger LOGGER = LoggerFactory.getLogger(BloomScheduler.class);
 
-    private BlockingQueue<String> queue = new LinkedBlockingQueue<String>();
+    private BlockingQueue<CrawlDatum> queue = Queues.newLinkedBlockingQueue();
     private BloomFilter<String> bloomFilter = new BloomFilter<String>(Config.BLOOMFILTER_ERROR_RATE, Config.BLOOMFILTER_RATE);
 
     @Override
-    public String poll() throws InterruptedException {
-        String url = queue.poll(3000, TimeUnit.MILLISECONDS);
-        if (url != null){
+    public CrawlDatum poll() throws InterruptedException {
+        CrawlDatum datum = queue.poll(3000, TimeUnit.MILLISECONDS);
+        if (datum.getUrl() != null) {
             takeTaskCount.incrementAndGet();
         }
-        logger.info("poll url: " + url);
-        return url;
+        LOGGER.info("method=poll, url={}", datum.getUrl());
+        return datum;
     }
 
     @Override
-    public void offer(List<String> urls) {
-        synchronized (this) {
-            for (String url : urls) {
-                if ((url != null) && !bloomFilter.contains(url)) {
-                    putTaskCount.incrementAndGet();
-                    bloomFilter.add(url);
-                    queue.offer(url);
-                    logger.info("offer url: " + url);
-                }
+    public synchronized void offer(List<CrawlDatum> requestList) {
+        for (CrawlDatum request : requestList){
+            if (StringUtils.isNotEmpty(request.getUrl()) && (!bloomFilter.contains(request.getUrl()))){
+                bloomFilter.add(request.getUrl());
+                queue.offer(request);
+                takeTaskCount.getAndIncrement();
+                LOGGER.info("method=offer, url={}", request.getUrl());
             }
         }
     }

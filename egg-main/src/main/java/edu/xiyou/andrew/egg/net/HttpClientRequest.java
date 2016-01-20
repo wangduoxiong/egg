@@ -3,8 +3,6 @@ package edu.xiyou.andrew.egg.net;
 import com.google.common.collect.ImmutableMap;
 import edu.xiyou.andrew.egg.model.CrawlDatum;
 import edu.xiyou.andrew.egg.model.Site;
-import edu.xiyou.andrew.egg.parser.Html;
-import edu.xiyou.andrew.egg.utils.Config;
 import edu.xiyou.andrew.egg.utils.HttpMeta;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.IOUtils;
@@ -21,8 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by duoxiongwang on 15-8-17.

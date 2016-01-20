@@ -46,24 +46,12 @@ public class CrawlDatum extends BaseModel implements Cloneable{
         return url;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
     public String getMethod() {
         return method;
     }
 
-    public void setMethod(String method) {
-        this.method = method;
-    }
-
     public Map<String, Object> getExtra() {
         return extra;
-    }
-
-    public void setExtra(Map<String, Object> extra) {
-       this.extra = extra;
     }
 
     public CrawlDatum addExtra(String key, Object value){
@@ -78,10 +66,6 @@ public class CrawlDatum extends BaseModel implements Cloneable{
 
     public boolean isStoreHtml() {
         return storeHtml;
-    }
-
-    public void setStoreHtml(boolean storeHtml) {
-        this.storeHtml = storeHtml;
     }
 
     @Override
@@ -104,26 +88,14 @@ public class CrawlDatum extends BaseModel implements Cloneable{
             storeHtml = true;
         }
 
-        public String getUrl() {
-            return url;
-        }
-
         public Builder setUrl(String url) {
             this.url = url;
             return this;
         }
 
-        public String getMethod() {
-            return method;
-        }
-
         public Builder setMethod(String method) {
             this.method = method;
             return this;
-        }
-
-        public Map<String, Object> getExtra() {
-            return extra;
         }
 
         public Builder setExtra(Map<String, Object> extra) {
@@ -132,10 +104,6 @@ public class CrawlDatum extends BaseModel implements Cloneable{
             }
             this.extra.putAll(extra);
             return this;
-        }
-
-        public boolean isStoreHtml() {
-            return storeHtml;
         }
 
         public Builder setStoreHtml(boolean storeHtml) {

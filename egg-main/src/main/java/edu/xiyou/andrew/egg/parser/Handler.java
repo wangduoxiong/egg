@@ -16,23 +16,32 @@ package edu.xiyou.andrew.egg.parser;
  * limitations under the License.
  */
 
-import edu.xiyou.andrew.egg.net.Response;
+import edu.xiyou.andrew.egg.net.Page;
+
+import java.util.List;
 
 /**
+ * 获取网页之后的操作接口
  * Created by andrew on 15-6-7.
  */
 public interface Handler {
 
     /**
      * 当抓取成功所做操作
-     * @param response
+     * @param page {@link edu.xiyou.andrew.egg.net.Page}
      */
-    public void onSuccess(Response response);
+    void onSuccess(Page page);
 
     /**
      * 抓取失败所做操作
-     * @param response
+     * @param page {@link edu.xiyou.andrew.egg.net.Page}
      */
-    public void onFail(Response response);
+    void onFail(Page page);
 
+    /**
+     *  获取下一次操作的链接
+     * @param page {@link edu.xiyou.andrew.egg.net.Page}
+     * @return
+     */
+    List<String> getNextLinks(Page page);
 }

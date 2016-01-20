@@ -16,6 +16,8 @@ package edu.xiyou.andrew.egg.scheduler;
  * limitations under the License.
  */
 
+import edu.xiyou.andrew.egg.model.CrawlDatum;
+
 import java.util.List;
 
 /**
@@ -23,16 +25,16 @@ import java.util.List;
  */
 public interface Scheduler {
     /**
-     * 获取新的任务
+     * 获取新的任务,
      * @return
      */
-    public String poll() throws InterruptedException;
+    public CrawlDatum poll() throws InterruptedException;
 
     /**
-     * 添加新加入的任务
-     * @param urls
+     * 添加新加入的任务,{@link edu.xiyou.andrew.egg.model.CrawlDatum}
+     * @param requestList
      */
-    public void offer(List<String> urls);
+    public void offer(List<CrawlDatum> requestList);
 
     public int currentCount();
 

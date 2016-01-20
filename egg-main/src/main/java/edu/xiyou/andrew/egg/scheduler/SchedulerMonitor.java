@@ -19,6 +19,7 @@ package edu.xiyou.andrew.egg.scheduler;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * 队列的监控的
  * Created by andrew on 15-6-7.
  */
 public abstract class SchedulerMonitor {

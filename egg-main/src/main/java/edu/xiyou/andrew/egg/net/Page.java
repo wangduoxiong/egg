@@ -16,7 +16,7 @@ import java.util.Map;
  *  获取网页内容后，将结果用本类保存
  * Created by andrew on 16-1-10.
  */
-public class Page implements Response {
+public class Page{
     private static final String DEFAULT_CHARSET = "UTF-8";
 
     private Site site;
@@ -27,7 +27,6 @@ public class Page implements Response {
     private byte[] rawText;
     private Map<String, String> results = Maps.newHashMap();
     private List<String> allLinksList;
-    private List<CrawlDatum>targetRequestList;          //下次请求的链接实体
     private boolean needSave = true;                        //是否保存本页
 
     public CrawlDatum getRequest() {
@@ -39,7 +38,6 @@ public class Page implements Response {
         return this;
     }
 
-    @Override
     public String getUrl() {
         if ((request == null) || StringUtils.isBlank(request.getUrl())){
             return null;
@@ -47,17 +45,14 @@ public class Page implements Response {
         return request.getUrl();
     }
 
-    @Override
     public byte[] getContent() {
         return rawText;
     }
 
-    @Override
     public Header[] getHeaders() {
         return headers;
     }
 
-    @Override
     public Header getHeader(String name) {
 
         for (Header header : headers) {
@@ -71,7 +66,6 @@ public class Page implements Response {
         return this;
     }
 
-    @Override
     public StatusLine getStatusLine() {
         return statusLine;
     }
@@ -90,12 +84,10 @@ public class Page implements Response {
         return this;
     }
 
-    @Override
     public Map<String, String> getResults() {
         return results;
     }
 
-    @Override
     public String getResult(String key){
         if (StringUtils.isBlank(key)){
             return "";
@@ -117,16 +109,6 @@ public class Page implements Response {
         return this;
     }
 
-    @Override
-    public List<CrawlDatum> getTargetRequestList() {
-        return targetRequestList;
-    }
-
-    public Page setTargetRequestList(List<CrawlDatum> targetRequestList) {
-        this.targetRequestList = targetRequestList;
-        return this;
-    }
-
     public boolean isNeedSave() {
         return needSave;
     }
@@ -136,7 +118,6 @@ public class Page implements Response {
         return this;
     }
 
-    @Override
     public List<String> getAllLinksList() {
         return allLinksList;
     }
@@ -146,7 +127,6 @@ public class Page implements Response {
         return this;
     }
 
-    @Override
     public Site getSite() {
         return site;
     }
@@ -156,7 +136,6 @@ public class Page implements Response {
         return this;
     }
 
-    @Override
     public String getCharSetName() {
         if (StringUtils.isBlank(charSetName)){
             charSetName = this.getSite().getCharset();
