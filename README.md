@@ -40,3 +40,20 @@ Egg 简介
 
 ### 邮件交流
 王捉熊630841816@qq.com
+
+### 0.3.00版本更新说明
+相对于以前的api，这个版本更加易用，功能也愈加完善，配置更加简单
+
+- 与之前的版本添加dataprocesspor包，用来处理Page 中的result 
+
+- 新添model包，系统中数据传输的model
+    * BaseModel任何model都可以继承它，它封装了model的共有操作
+    * 新添Site，用于配置爬虫爬取的站点信息，有了更加丰富的配置，类似于headers,cookie,等等
+- net包修改
+    * 添加FactoryMonitor 虚拟类，用来监控factory长生多少request
+    * 新添page 用来保存抓取后的数据
+    * RequestFactory用来产生request
+- 新添parse包，用来解析抓取数据
+    * Parser是一个解析器，用来方便用户提取抓取数据中自己需要的东西
+    * Handler是一个处理器，用来处理每次抓取之后的操作
+    * Selector是一个选择器，用来判断是否是我们所需要的内容
