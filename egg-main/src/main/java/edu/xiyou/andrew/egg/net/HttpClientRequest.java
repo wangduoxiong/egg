@@ -18,6 +18,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 /**
@@ -47,10 +48,10 @@ public class HttpClientRequest implements Request {
         }
         HttpUriRequest httpUriRequest = getHttpUriRequest(datum, site);
         HttpResponse response = httpClient.execute(httpUriRequest);
-        return handlerResponse(datum, response);
+        return handlerResponse(datum, site, response);
     }
 
-    private Page handlerResponse(CrawlDatum datum, HttpResponse response) {
+    private Page handlerResponse(CrawlDatum datum, Site site, HttpResponse response) {
         Page page = new Page();
         if (response == null) {
             return page;
@@ -60,6 +61,7 @@ public class HttpClientRequest implements Request {
             page.setRawText(IOUtils.toByteArray(response.getEntity().getContent()));
             page.setHeaders(response.getAllHeaders());
             page.setStatusLine(response.getStatusLine());
+            page.setSite(site);
         } catch (IOException e) {
             page.setRawText("".getBytes());
             LOGGER.error("method=handlerResponse, Exception={}, url={}", e, datum.getUrl());

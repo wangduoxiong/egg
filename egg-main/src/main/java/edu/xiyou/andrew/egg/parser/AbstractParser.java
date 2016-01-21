@@ -3,7 +3,9 @@ package edu.xiyou.andrew.egg.parser;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import edu.xiyou.andrew.egg.net.Page;
+import edu.xiyou.andrew.egg.utils.UrlUtils;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.SetUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
@@ -18,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,7 +36,7 @@ public abstract class AbstractParser implements Parser {
 
     private final static Pattern HREF_PATTERN = Pattern.compile("(<a[^>]*href=)['\"]([^'\">]*)['\"]", Pattern.CASE_INSENSITIVE);
 
-    public AbstractParser(Page page){
+    public AbstractParser(Page page) {
         this.page = page;
     }
 
@@ -56,12 +59,13 @@ public abstract class AbstractParser implements Parser {
     }
 
     @Override
-    public Parser getAllLink(){
+    public Parser getAllLink() {
         return getAllLink(true);
     }
 
     /**
      * 获取所有链接
+     *
      * @param unique 是否过过滤本页重复的链接 为true将过滤重复,反之为false
      * @return parser
      */
@@ -71,7 +75,7 @@ public abstract class AbstractParser implements Parser {
             return this;
         }
 
-        String charSetName =page.getCharSetName();
+        String charSetName = page.getCharSetName();
         Matcher matcher;
         try {
             matcher = HREF_PATTERN.matcher(new String(page.getRawText(), charSetName));
@@ -80,26 +84,25 @@ public abstract class AbstractParser implements Parser {
             matcher = HREF_PATTERN.matcher(new String(page.getRawText()));
         }
         Collection<String> urlCollection = null;
-        if (matcher.find()){
-            if (unique){
-                urlCollection = Sets.newHashSet();
-                urlCollection.add(matcher.group(2));
-            }else {
-                urlCollection = Lists.newArrayList();
+        if (unique) {
+            urlCollection = Sets.newHashSet();
+        } else {
+            urlCollection = Lists.newArrayList();
+        }
+        while (matcher.find()) {
+            if (StringUtils.isNotBlank(matcher.group(2))) {
                 urlCollection.add(matcher.group(2));
             }
         }
         this.targetListIfNotEmptyClear();
-        if (urlCollection != null) {
-            targetList.addAll(urlCollection);
-        }
+        targetList.addAll(extractValidAndAbsolute(Lists.newArrayList(urlCollection), page.getRequest().getUrl()));
         return this;
     }
 
     @Override
     public Parser regex(String regexStr) {
         this.targetListIfNotEmptyClear();
-        if (checkCurrentCondition(regexStr)){
+        if (checkCurrentCondition(regexStr)) {
             return this;
         }
         Pattern pattern = Pattern.compile(regexStr);
@@ -110,8 +113,8 @@ public abstract class AbstractParser implements Parser {
             LOGGER.debug("method=regex, Exception={}", e);
             matcher = pattern.matcher(new String(page.getRawText()));
         }
-        while (matcher.find()){
-            if (StringUtils.isNotEmpty(matcher.group())){
+        while (matcher.find()) {
+            if (StringUtils.isNotEmpty(matcher.group())) {
                 targetList.add(matcher.group());
             }
         }
@@ -119,32 +122,46 @@ public abstract class AbstractParser implements Parser {
     }
 
     @Override
-    public Parser regexLinks(RegexRule regex){
+    public Parser regexLinks(RegexRule regex) {
         this.targetListIfNotEmptyClear();
-        if (checkCurrentCondition(regex) || (regex.getPositive().size() <= 0)){
+        if (checkCurrentCondition(regex) || (regex.getPositive().size() <= 0)) {
             return this;
         }
         List<String> tmpList;
         tmpList = getAllLink().all();
-        targetList.clear();
-        if ((null == tmpList) || (tmpList.size() == 0)){
+        targetList = Lists.newArrayList();
+        if ((null == tmpList) || (tmpList.size() == 0)) {
             return this;
         }
-        for (String href : tmpList){
-            if (StringUtils.isBlank(href)){
+        for (String href : tmpList) {
+            if (StringUtils.isBlank(href)) {
                 continue;
             }
-            if (regex.satisfy(href)){
+            if (regex.satisfy(href)) {
                 targetList.add(href);
             }
         }
         return this;
     }
 
+    private List<String> extractValidAndAbsolute(List<String> urlList, String refer) {
+        List<String> resultList = Lists.newArrayList();
+        for (String url : urlList) {
+            if (StringUtils.isBlank(url) || url.equals("#") || url.startsWith("javascript:")) {
+                continue;
+            }
+            if (url.startsWith("/")) {
+                url = UrlUtils.canonicalizeUrl(url, refer);
+            }
+            resultList.add(url);
+        }
+        return resultList;
+    }
+
     @Override
     public Parser xpath(String xpathStr) {
         this.targetListIfNotEmptyClear();
-        if (checkCurrentCondition(xpathStr)){
+        if (checkCurrentCondition(xpathStr)) {
             return this;
         }
         HtmlCleaner htmlCleaner = new HtmlCleaner();
@@ -177,7 +194,7 @@ public abstract class AbstractParser implements Parser {
             document = Jsoup.parse(new String(page.getRawText()));
         }
         Elements elements = document.select(cssStr);
-        for (Element element : elements){
+        for (Element element : elements) {
             targetList.add(element.text());
         }
         return this;
@@ -192,32 +209,33 @@ public abstract class AbstractParser implements Parser {
     }
 
     @Override
-    public List<String> all(){
+    public List<String> all() {
         return targetList;
     }
 
     @Override
-    public void clear(){
+    public void clear() {
         targetList.clear();
     }
 
     @Override
-    public String get(){
-        if (CollectionUtils.isEmpty(targetList)){
+    public String get() {
+        if (CollectionUtils.isEmpty(targetList)) {
             return "";
         }
         return targetList.get(0);
     }
 
-    private void targetListIfNotEmptyClear(){
+    private void targetListIfNotEmptyClear() {
         if (targetList.size() > 0) {
             targetList.clear();
         }
     }
-    private <E>boolean checkCurrentCondition(E element){
+
+    private <E> boolean checkCurrentCondition(E element) {
         if (pageNullReturn())
             return true;
-        if (element instanceof String){
+        if (element instanceof String) {
             return StringUtils.isBlank((CharSequence) element);
         }
         return element == null;

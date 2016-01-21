@@ -35,7 +35,7 @@ public class CrawlDatum extends BaseModel implements Cloneable{
     private static String PROPERTY = "PROPERTY";               //优先级
     private boolean storeHtml = true;                               //是否将网页源码保存
 
-    public CrawlDatum(String url, String method, Map<String, Object> extra, boolean storeHtml) {
+    protected CrawlDatum(String url, String method, Map<String, Object> extra, boolean storeHtml) {
         this.url = url;
         this.method = method;
         this.extra = extra;

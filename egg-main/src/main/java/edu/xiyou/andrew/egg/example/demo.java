@@ -1,6 +1,10 @@
 package edu.xiyou.andrew.egg.example;
 
+import com.google.common.collect.Lists;
+import edu.xiyou.andrew.egg.dataprocessor.ConsoleProcesser;
 import edu.xiyou.andrew.egg.fetcher.Fetcher;
+import edu.xiyou.andrew.egg.model.CrawlDatum;
+import edu.xiyou.andrew.egg.parser.DefaultHandler;
 import edu.xiyou.andrew.egg.parser.Handler;
 import edu.xiyou.andrew.egg.parser.LinksList;
 import edu.xiyou.andrew.egg.net.Response;
@@ -8,6 +12,7 @@ import edu.xiyou.andrew.egg.scheduler.BloomScheduler;
 import edu.xiyou.andrew.egg.scheduler.HashSetScheduler;
 import edu.xiyou.andrew.egg.scheduler.Scheduler;
 import edu.xiyou.andrew.egg.parser.RegexRule;
+import edu.xiyou.andrew.egg.utils.TimeUtils;
 import org.jsoup.Jsoup;
 
 import java.util.Arrays;
@@ -19,15 +24,14 @@ import java.util.List;
  */
 public class demo {
     public static void main(String[] args) throws InterruptedException {
-        Scheduler scheduler = new HashSetScheduler();
         Long startTime = System.currentTimeMillis();
 
-        Fetcher fetcher =
-//        Config.cookies.put("key", "value");
-        fetcher.init();
-        fetcher.before();
-        fetcher.setScheduler(scheduler1);
-        scheduler1.offer(Arrays.asList("http://baike.baidu.com/"));
+        Scheduler hashScheduler = new HashSetScheduler();
+        hashScheduler.offer(Arrays.asList(CrawlDatum.custom().setUrl("http://baike.baidu.com/").build()));
+        Fetcher fetcher =Fetcher.custom().
+                setDataProcessorList(Lists.newArrayList(new ConsoleProcesser())).
+                setHandler(new DefaultHandler(new RegexRule(Lists.newArrayList("http://baike.baidu.com/\\S+"))))
+                .setScheduler(hashScheduler).builder();
 
         fetcher.fetch();
         fetcher.after();
@@ -37,22 +41,9 @@ public class demo {
         }
         spendTime = System.currentTimeMillis() - startTime;
 
-        System.out.println("spend time about " + currentTime2String(spendTime));
+        System.out.println("spend time about " + TimeUtils.currentTime2String(spendTime));
         System.out.printf("spendTime: " + spendTime);
     }
 
-    public static String currentTime2String(long currentTime) {
-        if (currentTime < 0) {
-            throw new IllegalArgumentException("time must bigger 0");
-        }
-        if (currentTime == 0) {
-            return "00:00:00:000";
-        }
-        int hours = (int) (currentTime / (60 * 60 * 1000));
-        int minutes = (int)(currentTime - hours * 60 * 60 * 1000) / 60000;
-        int second = (int)(currentTime - hours*60*60*1000 - minutes*60*1000)/1000;
-        int mills = (int)(currentTime%1000);
 
-        return new StringBuilder().append(hours).append(":").append(minutes).append(":").append(second).append(":").append(mills).toString();
-    }
 }

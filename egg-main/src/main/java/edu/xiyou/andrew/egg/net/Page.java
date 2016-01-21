@@ -28,7 +28,7 @@ public class Page{
     private String charSetName;
     private StatusLine statusLine;
     private byte[] rawText;
-    private HtmlParser htmlParser;
+    private HtmlParser htmlParser = new HtmlParser(this);
     private Map<String, String> results = Maps.newHashMap();
     private List<String> allLinksList;
     private boolean needSave = true;                        //是否保存本页

@@ -15,7 +15,7 @@ public class ConsoleProcesser implements DataProcessor {
 
     @Override
     public void process(Page page) {
-        if ((page != null) && MapUtils.isNotEmpty(page.getResults())) {
+        if ((page == null) || MapUtils.isEmpty(page.getResults())) {
             return;
         }
         Map<String, String> resultMap = page.getResults();

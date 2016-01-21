@@ -48,6 +48,7 @@ public class RegexRule implements Selector<String>{
      * @param list
      */
     public RegexRule(List<String> list){
+        this();
         for (String rule : list){
             addRule(rule);
         }

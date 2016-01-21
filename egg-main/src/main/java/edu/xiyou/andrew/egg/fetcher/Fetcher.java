@@ -23,13 +23,10 @@ import edu.xiyou.andrew.egg.model.CrawlDatum;
 import edu.xiyou.andrew.egg.model.Site;
 import edu.xiyou.andrew.egg.net.*;
 import edu.xiyou.andrew.egg.parser.Handler;
-import edu.xiyou.andrew.egg.parser.HtmlParser;
-import edu.xiyou.andrew.egg.parser.Parser;
 import edu.xiyou.andrew.egg.scheduler.BloomDepthScheduler;
 import edu.xiyou.andrew.egg.scheduler.Scheduler;
 import edu.xiyou.andrew.egg.thread.ThreadPool;
 import edu.xiyou.andrew.egg.utils.Config;
-import edu.xiyou.andrew.egg.parser.RegexRule;
 import edu.xiyou.andrew.egg.utils.UrlUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -62,13 +59,12 @@ public class Fetcher extends FetcherMonitor {
     private int depth;
     private final Handler handler;
     private Scheduler scheduler;
-    private RegexRule regexRule;
     private ThreadPool threadPool;
     private RequestFactory requestFactory;
     private volatile int poolSize = DEFAULT_THREAD_COUNT;
     private ReentrantLock reentrantLock = new ReentrantLock();
     private Condition newUrlCondition = reentrantLock.newCondition();
-    private List<DataProcessor> dataProcessorList = Lists.newArrayList();
+    private List<? extends DataProcessor> dataProcessorList = Lists.newArrayList();
     private Condition activeThreadCondition = reentrantLock.newCondition();
 
     private AtomicInteger activeThread;
@@ -77,13 +73,12 @@ public class Fetcher extends FetcherMonitor {
     private volatile long emptySleepTime = Config.emptySleepTime;
 
     public Fetcher(Scheduler scheduler, Handler handler, Site site,
-                   List<DataProcessor> dataProcessorList, RegexRule regexRule,
+                   List<? extends DataProcessor> dataProcessorList,
                    RequestFactory requestFactory) {
         super();
         this.site = site;
         this.handler = handler;
         this.scheduler = scheduler;
-        this.regexRule = regexRule;
         this.requestFactory = requestFactory;
         this.dataProcessorList = dataProcessorList;
 
@@ -100,12 +95,11 @@ public class Fetcher extends FetcherMonitor {
         private Scheduler scheduler;
         private Handler handler;
         private Site site;
-        private List<DataProcessor> dataProcessorList;
-        private RegexRule regexRule;
+        private List<? extends DataProcessor> dataProcessorList;
         private RequestFactory requestFactory;
 
         {
-            site = new Site().setDomain(UrlUtils.acquireDomain());
+            site = new Site();
             requestFactory = new HttpClientRequestFactory();
         }
 
@@ -124,18 +118,13 @@ public class Fetcher extends FetcherMonitor {
             return this;
         }
 
-        public Builder setDataProcessorList(List<DataProcessor> dataProcessorList) {
+        public Builder setDataProcessorList(List <? extends DataProcessor> dataProcessorList) {
             this.dataProcessorList = dataProcessorList;
             return this;
         }
 
-        public Builder setRegexRule(RegexRule regexRule) {
-            this.regexRule = regexRule;
-            return this;
-        }
-
         public Fetcher builder() {
-            return new Fetcher(scheduler, handler, site, dataProcessorList, regexRule, requestFactory);
+            return new Fetcher(scheduler, handler, site, dataProcessorList, requestFactory);
         }
     }
 
@@ -158,13 +147,13 @@ public class Fetcher extends FetcherMonitor {
                         stop();
                         Thread.sleep(5);
                     }
-                    Page page;
                     if (datum == null){
                         return;
                     }
                     if (runStatus == RUNNING && StringUtils.isNotBlank(datum.getUrl())) {
                         LOGGER.info("start " + FETCH_OUTPUT_STRING + datum);
-                        page = request.getResponse(datum, site);
+                        site.setDomain(UrlUtils.acquireDomain(datum.getUrl()));
+                        Page page = request.getResponse(datum, site);
 
                         synchronized (handler) {
                             if ((page == null) || (page.getStatusLine() == null) || !site.getAcceptStatusCode().contains(page.getStatusLine().getStatusCode())) {
@@ -186,11 +175,9 @@ public class Fetcher extends FetcherMonitor {
                     }
                 }
             } catch (InterruptedException e) {
-                LOGGER.error(new StringBuffer().append(Thread.currentThread().getName()).
-                        append(" InterruptedException: ").append(e).append("\ndatum:" ).append(datum).toString());
+                LOGGER.error("method=run, Exception={}", e);
             } catch (Exception e) {
-                LOGGER.error(new StringBuffer(Thread.currentThread().getName()).append(" Exception: ").append(e).
-                        append("\ndatum:").append(datum).toString());
+                LOGGER.error("method=run, Exception={}", e);
             } finally {
                 pollCount.incrementAndGet();
             }
@@ -203,7 +190,7 @@ public class Fetcher extends FetcherMonitor {
                     Thread.sleep(sleepTime);
                 }
             } catch (InterruptedException e) {
-                LOGGER.error("op=stop " + e);
+                LOGGER.error("method=stop, Exception={}", e);
             } finally {
                 reentrantLock.unlock();
             }
@@ -253,7 +240,7 @@ public class Fetcher extends FetcherMonitor {
                 execute(new FecherThread(finalDatum, requestFactory.createRequest(datum, site)));
 
             } catch (InterruptedException e) {
-                LOGGER.error("op=fetch exception: " + e);
+                LOGGER.error("method=fetch, Exception={}" , e);
             }
         }
     }
@@ -265,7 +252,7 @@ public class Fetcher extends FetcherMonitor {
                 activeThreadCondition.await();
             }
         } catch (InterruptedException e) {
-            LOGGER.error(Thread.currentThread().getName() + " run error: " + e);
+            LOGGER.error("method=execute, Exception={}:" , e);
         } finally {
             reentrantLock.unlock();
         }
@@ -296,7 +283,7 @@ public class Fetcher extends FetcherMonitor {
             }
             newUrlCondition.await(emptySleepTime, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
-            LOGGER.error("op=waitNewUrl exception: " + e);
+            LOGGER.error("method=waitNewUrl, Exception={}", e);
         } finally {
             reentrantLock.unlock();
         }
@@ -377,11 +364,7 @@ public class Fetcher extends FetcherMonitor {
         return handler;
     }
 
-    public List<DataProcessor> getDataProcessorList() {
+    public List<? extends DataProcessor> getDataProcessorList() {
         return dataProcessorList;
-    }
-
-    public RegexRule getRegexRule() {
-        return regexRule;
     }
 }
