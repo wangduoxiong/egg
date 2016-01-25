@@ -1,5 +1,4 @@
 import com.fasterxml.jackson.core.JsonProcessingException;
-import edu.xiyou.andrew.egg.model.CrawlDatum;
 import edu.xiyou.andrew.egg.parser.utils.JsonUtils;
 import org.junit.Test;
 
@@ -10,8 +9,8 @@ public class TestJsonUtils {
 
     @Test
     public void testobject2Json() throws JsonProcessingException {
-        CrawlDatum datum = new CrawlDatum.Builder().setUrl("asd").build();
+        /*CrawlDatum datum = new CrawlDatum.Builder().setUrl("asd").build();
 
-        System.out.println(JsonUtils.object2JsonString(datum));
+        System.out.println(JsonUtils.object2JsonString(datum));*/
     }
 }
