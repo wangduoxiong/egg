@@ -23,7 +23,7 @@ import edu.xiyou.andrew.egg.model.CrawlDatum;
 import edu.xiyou.andrew.egg.model.Site;
 import edu.xiyou.andrew.egg.net.*;
 import edu.xiyou.andrew.egg.parser.Handler;
-import edu.xiyou.andrew.egg.scheduler.BloomDepthScheduler;
+import edu.xiyou.andrew.egg.scheduler.DefaultScheduler;
 import edu.xiyou.andrew.egg.scheduler.Scheduler;
 import edu.xiyou.andrew.egg.thread.ThreadPool;
 import edu.xiyou.andrew.egg.utils.Config;
@@ -174,8 +174,6 @@ public class Fetcher extends FetcherMonitor {
                         }
                     }
                 }
-            } catch (InterruptedException e) {
-                LOGGER.error("method=run, Exception={}", e);
             } catch (Exception e) {
                 LOGGER.error("method=run, Exception={}", e);
             } finally {
@@ -198,9 +196,7 @@ public class Fetcher extends FetcherMonitor {
     }
 
     public void before() {
-        if (scheduler instanceof BloomDepthScheduler) {
-            ((BloomDepthScheduler) scheduler).merge();
-        }
+
     }
 
     public void after() {
@@ -300,7 +296,7 @@ public class Fetcher extends FetcherMonitor {
 
     public void addSeed(List<String> urlList) {
         if (scheduler == null) {
-            scheduler = new BloomDepthScheduler();
+            scheduler = new DefaultScheduler();
         }
         reentrantLock.lock();
         List<CrawlDatum>crawlDatumList = Lists.newArrayListWithCapacity(urlList.size());

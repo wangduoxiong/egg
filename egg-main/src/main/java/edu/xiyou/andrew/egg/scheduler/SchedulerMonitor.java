@@ -23,8 +23,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Created by andrew on 15-6-7.
  */
 public abstract class SchedulerMonitor {
-    protected AtomicInteger takeTaskCount = new AtomicInteger(0);
-    protected AtomicInteger putTaskCount = new AtomicInteger(0);
+    AtomicInteger takeTaskCount = new AtomicInteger(0);
+    private AtomicInteger putTaskCount = new AtomicInteger(0);
 
     /**
      * 获取已经虫队列中取出请求的数量

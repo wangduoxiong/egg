@@ -35,12 +35,6 @@
         <jackson.version>1.9.13</jackson.version>
     </properties>
     <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <scope>test</scope>
-        </dependency>
 
         <!-- spring核心包 -->
         <!-- springframe start -->

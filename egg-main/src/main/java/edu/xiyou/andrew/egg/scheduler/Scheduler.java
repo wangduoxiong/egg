@@ -19,24 +19,49 @@ package edu.xiyou.andrew.egg.scheduler;
 import edu.xiyou.andrew.egg.model.CrawlDatum;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by andrew on 15-6-6.
  */
 public interface Scheduler {
     /**
-     * 获取新的任务,
+     * 获取新的任务,超时则返回null
+     *
      * @return
      */
-    public CrawlDatum poll() throws InterruptedException;
+    CrawlDatum poll(long timeout, TimeUnit unit) throws InterruptedException;
+
+    /**
+     * 获取新任务
+     * @return
+     * @throws InterruptedException
+     */
+    CrawlDatum poll() throws InterruptedException;
 
     /**
      * 添加新加入的任务,{@link edu.xiyou.andrew.egg.model.CrawlDatum}
+     *
      * @param requestList
+     * @return 插入成功返回 true, 插入失败返回null
+     * @throws InterruptedException
      */
-    public void offer(List<CrawlDatum> requestList);
+    boolean offer(List<CrawlDatum> requestList)throws InterruptedException;
 
-    public int currentCount();
+    /**
+     * 添加新任务
+     * @param requestList
+     * @param timeout
+     * @param unit
+     * @return 插入成功返回true, 插入失败或者超时返回false
+     */
+    boolean offer(List<CrawlDatum> requestList, long timeout, TimeUnit unit) throws InterruptedException;
+
+    /**
+     * 当前调度器中存在的元素数量
+     * @return
+     */
+    int currentCount();
 
     void clear();
 }
